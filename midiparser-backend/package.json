@@ -1,0 +1,21 @@
+{
+  "name": "midi-parser",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pioug/MidiConvert": "^3.0.0-beta.9",
+    "@tonaljs/tonal": "^4.6.5",
+    "@tonejs/midi": "^2.0.28",
+    "midi-file": "^1.2.2",
+    "midi-parser-js": "^4.0.4",
+    "midiconvert": "^0.4.7"
+  }
+}
