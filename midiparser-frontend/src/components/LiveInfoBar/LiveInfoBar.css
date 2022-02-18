@@ -1,0 +1,9 @@
+.InfoBar {
+    width: 70vw;
+    height: 30vh;
+    background-color:rgb(156, 59, 252);
+}
+
+.InfoField {
+    padding: 30px;
+}

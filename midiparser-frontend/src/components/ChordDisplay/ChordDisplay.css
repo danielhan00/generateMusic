@@ -1,0 +1,14 @@
+.ChordText {
+    text-align: center;
+    vertical-align: center;
+    padding-top:25vh;
+    font-size: 132px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.ChordContainer {
+    width: 70vw;
+    height: 70vh;
+    min-height: 70vh;
+    background-color:aqua;
+}
