@@ -2,8 +2,25 @@
     width: 70vw;
     height: 30vh;
     background-color:rgb(156, 59, 252);
+    display: inline-block;
+}
+
+.InfoTable {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.MeasureBar {
+    width: 30vw;
+    height: 30vh;
+    background-color:rgb(202, 148, 255);
+    display: inline-block;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .InfoField {
     padding: 30px;
+    font-weight: bold;
 }

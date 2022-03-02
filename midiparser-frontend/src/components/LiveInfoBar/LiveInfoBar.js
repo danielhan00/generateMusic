@@ -5,12 +5,12 @@ import { TimeSignatureInput } from '../reusable/TimeSignatureInput/TimeSignature
 import './LiveInfoBar.css';
 
 export const LiveInfoBar =(props)=>{
-    return <div className="InfoBar">
-        <table>
+    return <div><div className="InfoBar">
+        <table className="InfoTable">
             <tr>
                 <td className="InfoField">
                     <text>Genre</text>
-                    <DropdownMenu buttonName={props.genre}></DropdownMenu>
+                    <DropdownMenu buttonName={props.genre} onClick={props.genreChangeClick} buttonOptions={['Rock', 'Jazz', 'Ragtime']}></DropdownMenu>
                 </td>
                 <td className="InfoField">
                     <text>Tempo</text>
@@ -18,14 +18,23 @@ export const LiveInfoBar =(props)=>{
                 </td>
                 <td className="InfoField">
                     <text>Time Signature</text>
-                    <TimeSignatureInput input={props.tempo}></TimeSignatureInput>
+                    <TimeSignatureInput input={props.timeSig}></TimeSignatureInput>
                 </td>
                 <td className="InfoField">
-                    <text>Time Signature</text>
-                    <CounterTextField input={props.tempo}></CounterTextField>
+                    <text>Key</text>
+                    <br></br>
+                    <input input={props.tempo}></input>
+                </td>
+                <td className="InfoField">
+                <text>Randomness</text>
+                    <CounterTextField input={props.tempo}  min='0' max='10'></CounterTextField>
                 </td>
             </tr>
         </table>
         
+    </div>
+    <div className="MeasureBar">
+        {/* WILL ADD THE METRONOME TEXT LATER*/}
+    </div>
     </div>;
 }
