@@ -8,7 +8,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 ReactDOM.render(
   <React.StrictMode>
-    <LivePerformanceTool chordName={'Amin'} genre='Crabcore'/>
+    <LivePerformanceTool chordName={'Amin'} />
   </React.StrictMode>,
   document.getElementById('root')
 );
