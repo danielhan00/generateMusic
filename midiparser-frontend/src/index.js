@@ -9,8 +9,8 @@ import { SongWritingTool } from './components/SongWritingTool/SongWritingTool';
 
 ReactDOM.render(
   <React.StrictMode>
-    {/*<LivePerformanceTool chordName={'Amin'} genre='Crabcore'/>*/}
-    <SongWritingTool genre="Pop"></SongWritingTool>
+    {/*<SongWritingTool genre="Pop" />*/}
+    <LivePerformanceTool chordName={'Amin'} />
   </React.StrictMode>,
   document.getElementById('root')
 );

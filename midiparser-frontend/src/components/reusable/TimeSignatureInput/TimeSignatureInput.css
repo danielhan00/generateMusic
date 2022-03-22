@@ -3,7 +3,9 @@
 }
 
 .TimeSigDivider {
-    color:antiquewhite;
-    font-weight:bolder;
-    font-size: 30px;
+    border-top: 3px solid antiquewhite;
+    width: 50px;
+    padding: 0px;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
