@@ -5,10 +5,12 @@ import App from './App';
 import { LivePerformanceTool } from './components/LivePerformanceTool/LivePerformanceTool'
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.css';
+import { SongWritingTool } from './components/SongWritingTool/SongWritingTool';
 
 ReactDOM.render(
   <React.StrictMode>
-    <LivePerformanceTool chordName={'Amin'} genre='Crabcore'/>
+    {/*<LivePerformanceTool chordName={'Amin'} genre='Crabcore'/>*/}
+    <SongWritingTool genre="Pop"></SongWritingTool>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,0 +1,17 @@
+.TransportBar {
+    width: 100vw;
+    height: 50vh;
+    background-color:rgb(11, 31, 75);
+    display: inline-block;
+}
+.TransportTable {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.TransportField {
+    padding: 30px;
+    font-weight: bold;
+    color: #fff;
+}
