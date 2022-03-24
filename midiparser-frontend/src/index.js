@@ -10,7 +10,8 @@ import { SongWritingTool } from './components/SongWritingTool/SongWritingTool';
 ReactDOM.render(
   <React.StrictMode>
     {/*<SongWritingTool genre="Pop" />*/}
-    <LivePerformanceTool chordName={'Amin'} />
+    {/*<LivePerformanceTool chordName={'Amin'} />*/}
+    <App/>
   </React.StrictMode>,
   document.getElementById('root')
 );

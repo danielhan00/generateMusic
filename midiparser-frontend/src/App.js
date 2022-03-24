@@ -1,25 +1,41 @@
 import React from 'react'
-import logo from './logo.svg';
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Link
+  } from "react-router-dom";
 import './App.css';
+import { LivePerformanceTool } from './components/LivePerformanceTool/LivePerformanceTool';
+import { SongWritingTool } from './components/SongWritingTool/SongWritingTool';
+import { Home } from './components/Home/Home';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <nav>
+          <table className="NavBar">
+              <tr>
+              <td><Link className="NavText" to="/">Home</Link></td>
+              <td><Link className="NavText" to="/songwriting">Songwriting Tool</Link></td>
+              <td><Link className="NavText" to="/liveperformance">Live Performance Tool</Link></td>
+              </tr>
+          </table>
+        </nav>
+
+        {/* A <Switch> looks through its children <Route>s and
+            renders the first one that matches the current URL. */}
+        <Routes>
+          <Route path="/liveperformance" element={<LivePerformanceTool chordName="Amaj"/>}>
+          </Route>
+          <Route path="/songwriting" element={<SongWritingTool/>}>
+          </Route>
+          <Route path="/" element={<Home/>}>
+          </Route>
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

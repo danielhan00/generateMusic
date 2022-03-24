@@ -15,16 +15,19 @@
 
 .ChordContainer {
     width: 70vw;
-    height: 70vh;
-    min-height: 70vh;
+    height: 69vh;
     background-color:aqua;
     display: inline-block;
 }
 
+.Container {
+    width: 10vw;
+    height: 69vh;
+}
+
 .NextChordContainer {
     width: 30vw;
-    height: 70vh;
-    min-height: 70vh;
+    height: 69vh;
     background-color:rgb(168, 255, 255);
     display: inline-block;
 }

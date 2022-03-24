@@ -1,3 +1,15 @@
+.NavBar {
+    text-align: center;
+    height: 10vh;
+    width: 100vw;
+    background-color: darkblue;
+}
+
+.NavText {
+    color: white;
+    font-size: 20px;
+}
+
 .App {
   text-align: center;
 }
