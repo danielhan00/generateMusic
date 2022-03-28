@@ -1,0 +1,11 @@
+.TimeSigNum {
+    max-width: 50px;
+}
+
+.TimeSigDivider {
+    border-top: 3px solid antiquewhite;
+    width: 50px;
+    padding: 0px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
