@@ -2,11 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import { LivePerformanceTool } from './components/LivePerformanceTool/LivePerformanceTool'
 import reportWebVitals from './reportWebVitals';
+import 'bootstrap/dist/css/bootstrap.css';
+import { SongWritingTool } from './components/SongWritingTool/SongWritingTool';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    {/*<SongWritingTool genre="Pop" />*/}
+    {/*<LivePerformanceTool chordName={'Amin'} />*/}
+    <App/>
   </React.StrictMode>,
   document.getElementById('root')
 );

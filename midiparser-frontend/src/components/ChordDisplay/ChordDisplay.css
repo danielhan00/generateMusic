@@ -1,0 +1,33 @@
+.ChordText {
+    text-align: center;
+    vertical-align: center;
+    padding-top:15vh;
+    font-size: 132px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.ChordHeader {
+    text-align: center;
+    vertical-align: top;
+    font-size: 66px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.ChordContainer {
+    width: 70vw;
+    height: 69vh;
+    background-color:aqua;
+    display: inline-block;
+}
+
+.Container {
+    width: 10vw;
+    height: 69vh;
+}
+
+.NextChordContainer {
+    width: 30vw;
+    height: 69vh;
+    background-color:rgb(168, 255, 255);
+    display: inline-block;
+}

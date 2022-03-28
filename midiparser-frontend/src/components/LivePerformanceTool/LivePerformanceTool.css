@@ -1,0 +1,11 @@
+.Container {
+    width:max-content;
+    height:max-content;
+}
+
+.ChordContainter {
+    width: 70vh;
+    height: 70vh;
+    background-color:aqua;
+    color: aqua;
+}
