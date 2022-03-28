@@ -1,19 +1,18 @@
 const { detect } = require('@tonaljs/chord-detect')
 const { Pcset } = require('@tonaljs/tonal')
 const MidiConvert = require('midiconvert')
-const { Midi, Interval, Note, Scale } = require('@tonaljs/tonal')
+const { Midi, Key, Scale } = require('@tonaljs/tonal')
 
-var key = ''
-var bpm = 0
-var timeSignature = []
-var meausureDuration
-var notes = []
+//sample data for testing
+var key = 'C'
+var mode = 'Minor'
+var genre = 'Rock'
 
 let fs = require('fs')
 fs.readFile('testmid.mid', 'binary', function (err, midiBlob) {
   if (!err) {
     midi = MidiConvert.parse(midiBlob)
-    notes = midi.tracks[1].notes
+    notes = getFirstChannel(midi.tracks)
     bpm = midi.header.bpm
     timeSignature = midi.header.timeSignature
     meausureDuration = (240 / bpm) * (timeSignature[0] / timeSignature[1])
@@ -88,3 +87,25 @@ function parseBars(noteArray, duration) {
 
   return dict
 }
+
+function getChords(key, mode) {
+  if (mode.toLowerCase() == 'major') {
+    chords = Key.majorKey(key).chords
+    console.log('major', chords)
+    return chords
+  }
+  //minor funtion not working
+  if (mode.toLowerCase() == 'minor') {
+    minorChords = Key.minorKey('C').chords
+    console.log('minor', minorChords)
+    return minorChords
+  }
+}
+function getFirstChannel(tracks) {
+  for (var i = 0; i < tracks.length; i++) {
+    if (tracks[i].notes.length != 0) {
+      return tracks[i].notes
+    }
+  }
+}
+getChords(key, mode)
