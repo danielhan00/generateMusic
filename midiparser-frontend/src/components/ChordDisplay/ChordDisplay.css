@@ -16,18 +16,19 @@
 .ChordContainer {
     width: 70vw;
     height: 69vh;
-    background-color:aqua;
+    background-color:rgb(231, 234, 245);
     display: inline-block;
 }
 
-.Container {
+.LiveTopContainer {
     width: 10vw;
     height: 69vh;
+    vertical-align: top;
 }
 
 .NextChordContainer {
     width: 30vw;
     height: 69vh;
-    background-color:rgb(168, 255, 255);
+    background-color:rgb(183, 186, 197);
     display: inline-block;
 }

@@ -1,13 +1,35 @@
-import React, {useState} from "react";
-import { TransportBar } from "../TransportBar/TransportBar";
-import { MidiInput } from "../MidiInput/MidiInput";
+import React from "react";
+import './Home.css';
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Link
+  } from "react-router-dom";
+import { LivePerformanceTool } from "../LivePerformanceTool/LivePerformanceTool";
+import { SongWritingTool } from "../SongWritingTool/SongWritingTool";
 
 export const Home =(props)=>{
-
-    const [genre, setGenre] = useState('Placeholder');
     
-    return <div className="Container">
-        <MidiInput></MidiInput>
-       <TransportBar genre={props.genre} tempo={props.tempo} timeSig={props.timeSig} key={props.key}></TransportBar>
-    </div>;
+    return <div className="HomeContainer">
+        <table className="ContentTable">
+            <tr>
+                <td>
+                    <div className="ContentBox">
+                    <Link className="ContentText" to="/songwriting">Songwriting Tool</Link>
+                    <image></image>
+                    </div>
+                </td>
+                <td>
+                    <div className="Divider"></div>
+                </td>
+                <td>
+                <div className="ContentBox">
+                    <Link className="ContentText" to="/liveperformance">Live Performance Tool</Link>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    ;
 }

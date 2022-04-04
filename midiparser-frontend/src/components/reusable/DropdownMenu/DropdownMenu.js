@@ -3,7 +3,7 @@ import {DropdownButton, Dropdown } from 'react-bootstrap';
 import './DropdownMenu.css';
 
 export const DropdownMenu = (props) => {
-    return <DropdownButton id="dropdown-basic-button" variant="secondary" title={props.buttonName}>
+    return <DropdownButton disabled={props.playing} id="dropdown-basic-button" variant="secondary" title={props.buttonName}>
     {createButtonOptions(props.buttonOptions, props.onClick)}
   </DropdownButton>
 }
