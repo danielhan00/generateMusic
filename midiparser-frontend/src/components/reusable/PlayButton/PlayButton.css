@@ -1,0 +1,67 @@
+#playButton{
+  position: relative;
+  /* the button's background color */
+  background: #fff; 
+  border: none;
+  outline:none;
+  height: 4em;
+  width: 4em;
+  font-size: 2em; 
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, .3);
+  cursor:pointer;
+   /* the button's a circle */ 
+	-moz-border-radius: 5em;
+	-webkit-border-radius: 5em;
+	border-radius: 5em;
+  
+}
+
+#pauseButton{
+    position: relative;
+    /* the button's background color */
+    background: #fff; 
+    border: none;
+    outline:none;
+    height: 4em;
+    width: 4em;
+    font-size: 2em; 
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, .3);
+    cursor:pointer;
+     /* the button's a circle */ 
+      -moz-border-radius: 5em;
+      -webkit-border-radius: 5em;
+      border-radius: 5em;
+    
+  }
+
+
+ /* the button's top layer: size, shape, appearance */
+#playButton:before {
+  content: "";
+  position: absolute;
+  top: 1em;
+   /* for visual centering */
+  left: 1.16em;
+  height: 0;
+  border-style: solid;
+  border-width: 1em 0 1em 2em;
+  /* create shape with color */
+  border-color: transparent transparent transparent darkblue; 
+  transition: .218s ease;
+}
+
+
+ /* the button's mouseover/click/hover layer: size, shape, appearance */
+#pauseButton:before {
+  content: "";
+  position: absolute;
+  background: inherit;
+  height: 2em;
+  top: 1em;
+  border-style: double;
+  border-width: 0 0 0 2em;
+  border-color: transparent transparent transparent darkblue; 
+   /* for visual centering */
+  left: 1em;
+  transition: .218s ease;
+}

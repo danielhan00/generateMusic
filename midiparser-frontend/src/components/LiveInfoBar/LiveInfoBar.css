@@ -1,7 +1,12 @@
+.LiveBottomContainer {
+    display: inline-block;
+    vertical-align: top;
+}
+
 .InfoBar {
     width: 70vw;
     height: 20vh;
-    background-color:rgb(156, 59, 252);
+    background-color:rgb(91, 91, 216);
     display: inline-block;
 }
 
@@ -14,10 +19,16 @@
 .MeasureBar {
     width: 30vw;
     height: 20vh;
-    background-color:rgb(202, 148, 255);
+    background-color:rgb(1, 1, 107);
     display: inline-block;
+    vertical-align: top;
     text-align: center;
+}
+
+.MeasureText {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 132px;
+    color: white;
 }
 
 .InfoField {
