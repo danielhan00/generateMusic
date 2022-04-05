@@ -16,6 +16,7 @@
     "@tonejs/midi": "^2.0.28",
     "midi-file": "^1.2.2",
     "midi-parser-js": "^4.0.4",
-    "midiconvert": "^0.4.7"
+    "midiconvert": "^0.4.7",
+    "papaparse": "^5.3.2"
   }
 }
