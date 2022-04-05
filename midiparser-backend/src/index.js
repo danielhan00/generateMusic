@@ -2,6 +2,7 @@ const { detect } = require('@tonaljs/chord-detect')
 const { Pcset } = require('@tonaljs/tonal')
 const MidiConvert = require('midiconvert')
 const { Midi, Key, Scale } = require('@tonaljs/tonal')
+const Papa = require('papaparse')
 
 //sample data for testing
 var key = 'C'
@@ -9,7 +10,7 @@ var mode = 'Major'
 var genre = 'Rock'
 
 let fs = require('fs')
-fs.readFile('testmid.mid', 'binary', function (err, midiBlob) {
+fs.readFile(fileName, 'binary', function (err, midiBlob) {
   if (!err) {
     midi = MidiConvert.parse(midiBlob)
     notes = getFirstChannel(midi.tracks)
@@ -18,6 +19,7 @@ fs.readFile('testmid.mid', 'binary', function (err, midiBlob) {
     meausureDuration = (240 / bpm) * (timeSignature[0] / timeSignature[1])
     bars = parseBars(notes, meausureDuration)
     notesInBar = noteDictionary(bars)
+    //console.log(bars[0][0])
     //console.log(meausureDuration)
     //console.log(numberToNoteNames(notes))
   } else {
@@ -56,7 +58,7 @@ function noteDictionary(bars) {
 function parseBars(noteArray, duration) {
   let dict = new Object()
   let barDuration = duration
-  let bar = 1
+  let bar = 0
   let currBar = []
 
   for (var i = 0; i < noteArray.length; i++) {
@@ -86,13 +88,13 @@ function parseBars(noteArray, duration) {
 function getChords(key, mode) {
   if (mode.toLowerCase() == 'major') {
     chords = Key.majorKey(key).chords
-    console.log('major', chords)
+    //console.log('major', chords)
     return chords
   }
   //minor function not working
   if (mode.toLowerCase() == 'minor') {
     minorChords = Key.minorKey('C').chords
-    console.log('minor', minorChords)
+    //console.log('minor', minorChords)
     return minorChords
   }
 }
