@@ -1,6 +1,7 @@
 const { detect } = require('@tonaljs/chord-detect')
-const { Pcset } = require('@tonaljs/tonal')
+const { Pcset, Tonal } = require('@tonaljs/tonal')
 const MidiConvert = require('midiconvert')
+const { Progression } = require('@tonaljs/tonal')
 const { Midi, Key, Scale } = require('@tonaljs/tonal')
 const Papa = require('papaparse')
 
@@ -10,23 +11,32 @@ var mode = 'Major'
 var genre = 'Rock'
 
 let fs = require('fs')
-fs.readFile(fileName, 'binary', function (err, midiBlob) {
-  if (!err) {
-    midi = MidiConvert.parse(midiBlob)
-    notes = getFirstChannel(midi.tracks)
-    bpm = midi.header.bpm
-    timeSignature = midi.header.timeSignature
-    meausureDuration = (240 / bpm) * (timeSignature[0] / timeSignature[1])
-    bars = parseBars(notes, meausureDuration)
-    notesInBar = noteDictionary(bars)
-    //console.log(bars[0][0])
-    //console.log(meausureDuration)
-    //console.log(numberToNoteNames(notes))
-  } else {
-    console.log('error')
-  }
-})
+function readMidi(fileName) {
+  fs.readFile(fileName, 'binary', function (err, midiBlob) {
+    if (!err) {
+      midi = MidiConvert.parse(midiBlob)
+      notes = getFirstChannel(midi.tracks)
+      bpm = midi.header.bpm
+      timeSignature = midi.header.timeSignature
+      meausureDuration = (240 / bpm) * (timeSignature[0] / timeSignature[1])
+      bars = parseBars(notes, meausureDuration)
+      notesInBar = noteDictionary(bars)
+      midiInfo = {}
+      midiInfo['tempo'] = bpm
+      midiInfo['time signature'] = timeSignature
+      midiInfo['bar duration'] = meausureDuration
+      midiInfo['parsed bars'] = bars
+      midiInfo['notes in bar'] = notesInBar
 
+      console.log(meausureDuration)
+      //console.log(numberToNoteNames(notes))
+
+      return midiInfo
+    } else {
+      console.log('error')
+    }
+  })
+}
 // returns array of notes in given key
 function notesInKey(key) {
   return Scale.get(key).notes
@@ -107,4 +117,28 @@ function getFirstChannel(tracks) {
     }
   }
 }
+
+const file = fs.createReadStream('midiparser-backend/Chords.csv')
+var csvData = []
+Papa.parse(file, {
+  header: true,
+  step: function (result) {
+    csvData.push(result.data)
+  },
+  complete: function (results, file) {
+    console.log('Complete', csvData.length, 'records.')
+    for (var i = 0; i < csvData.length; i++) {
+      chords = csvData[i].chords.split(',')
+      tonality = csvData[i].tonality
+      if (tonality != '') {
+        //console.log(tonality, chords)
+        console.log(tonality, Progression.toRomanNumerals(tonality, chords))
+      }
+    }
+  },
+})
+
 getChords(key, mode)
+console.log(readMidi('testmid.mid')['tempo'])
+
+console.log(Progression.toRomanNumerals('D', ['D']))
