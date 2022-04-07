@@ -1,14 +1,14 @@
 import csv
 from music21 import *
-file = open('midiparser-backend/Chords.csv')
+file = open('midiparser-backend/artistsAndGenres.csv')
 csvreader = csv.reader(file)
 header = next(csvreader)
 modeColumn = ['mode']
 romanColumn = ['roman numerals']
 count = 1
 for row in csvreader:
-    tonality = row[3]
-    chords = row[5].split(',')
+    tonality = row[5]
+    chords = row[7].split(',')
     romanAnalysis = []
     romanString = ''
     mode = ''
@@ -85,3 +85,9 @@ def add_col_to_csv(csvfile, fileout, new_list):
             csv_writer.writerow(row)
             i += 1
     print('done!')
+
+
+add_col_to_csv('midiparser-backend/artistsAndGenres.csv',
+               'midiparser-backend/dataWithRoman.csv', romanColumn)
+add_col_to_csv('midiparser-backend/dataWithRoman.csv',
+               'midiparser-backend/dataWithRomanAndMode.csv', modeColumn)
