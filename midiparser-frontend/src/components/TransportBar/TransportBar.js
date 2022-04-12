@@ -18,12 +18,13 @@ export const TransportBar = (props) => {
                 </td>
                 <td className="TransportField">
                     <text>Time Signature</text>
-                    <TimeSignatureInput input={props.timeSig}></TimeSignatureInput>
+                    <TimeSignatureInput playing={props.playing} setNumerator={props.setTimeSigNum} numerator={props.timeSigNum} setDenominator={props.setTimeSigDenom} denominator={props.timeSigDenom}
+                    numMin={1} numMax={16} denMin={2} denMax={16}></TimeSignatureInput>
                 </td>
                 <td className="TransportField">
                     <text>Key</text>
-                    <br></br>
-                    <input input={props.key}></input>
+                    <DropdownMenu buttonName={props.keyLetter} onClick={props.keyLetterClick} buttonOptions={['A', 'B', 'C', 'D', 'E', 'F', 'G']}></DropdownMenu>
+                    <DropdownMenu buttonName={props.keyQuality} onClick={props.keyQualityClick} buttonOptions={['Major', 'Minor']}></DropdownMenu>
                 </td>
             </tr>
         </table>
