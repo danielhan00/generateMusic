@@ -1,6 +1,6 @@
 .TransportBar {
     width: 100vw;
-    height: 50vh;
+    height: 20vh;
     background-color:rgb(11, 31, 75);
     display: inline-block;
 }

@@ -1,0 +1,21 @@
+.SuggestionBar {
+    width: 100vw;
+    height: 10vh;
+    background-color:rgb(187, 205, 242);
+    display: inline-block;
+    padding-left: 100px;
+    display: -webkit-inline-box;
+}
+.SuggestionTable {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.Suggestion {
+    padding: 30px;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    
+}
