@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-//import { parseBars } from "../../../../midiparser-backend/src";
+import { parseBars } from "../../midiparser-backend";
 import './MidiInput.css';
 import PianoRoll from "react-piano-roll";
 import { FilePicker } from "../reusable/FilePicker/FilePicker";
@@ -58,7 +58,7 @@ export const MidiInput = (props) => {
       ["0:0:0", 61, "2n"],
       ["0:0:0", 62, "3n"],
       ["0:0:0", 63, "4n"],
-      ["0:2:0", 64, "8n"],
+      ["0:3:0", 64, "8n"],
       ["0:3:0", 65, "16n"],
       ["0:0:0", 66, "32n"],
     ]}
@@ -109,47 +109,23 @@ function uploadMidi(content) {
   //transportHelp(bpm, timeSig[0], notes[1].time);
   console.log(parseBars(notes, measureDuration));
   //setMeasures(Object.keys(parseBars(notes, meausureDuration)).length);
-
+  //console.log(readMidi(content));
   midiFile[bpm] = bpm;
   midiFile.timeSig = timeSig;
   midiFile.measures = Object.keys(parseBars(notes, measureDuration)).length;
+  console.log("num measures" + parseBars(notes, measureDuration))
 
+  
+  
   console.log(midiFile[bpm]);
   return {
     bpm: bpm,
     timeSig: timeSig,
     measures: Object.keys(parseBars(notes, measureDuration)).length,
   }
+  
 }
 
-function parseBars(noteArray, duration) {
-    let dict = new Object()
-    let bar = duration
-    let count = 1
-    let currBar = []
-  
-    for (var i = 0; i < noteArray.length; i++) {
-      if (noteArray[i].time < bar) {
-        currBar.push(noteArray[i])
-        if (noteArray[i].time + noteArray[i].duration > bar) {
-          dict[count] = currBar
-          currBar = []
-          count++
-          currBar.push(noteArray[i])
-          bar += duration
-        }
-      } else {
-        dict[count] = currBar
-        currBar = []
-        count++
-        currBar.push(noteArray[i])
-        bar += duration
-      }
-    }
-    dict[count] = currBar
-  
-    return dict
-  }
 /*
 TO:DO
 -parse out midi stuff for piano roll
