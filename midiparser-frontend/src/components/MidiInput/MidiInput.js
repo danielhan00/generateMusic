@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { parseBars } from "../../midiparser-backend";
+import { parseBars, getFirstChannel,getNoteData } from "../../midiparser-backend";
 import './MidiInput.css';
 import PianoRoll from "react-piano-roll";
 import { FilePicker } from "../reusable/FilePicker/FilePicker";
@@ -100,7 +100,7 @@ function uploadMidi(content) {
   //setBPM(timeSig);
   const bpm = midi.header.bpm;
   //setTimeSig(bpm);
-  const notes = midi.tracks[1].notes;
+  const notes = getFirstChannel(midi.tracks);
   console.log("time Sig: " + timeSig);
   console.log("bpm: " + bpm);
   const measureDuration = (240 / bpm) * (timeSig[0] / timeSig[1]);
