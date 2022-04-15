@@ -14,7 +14,7 @@ export const LiveInfoBar = (props) => {
                 </td>
                 <td className="InfoField">
                     <text>Genre</text>
-                    <DropdownMenu playing={props.playing} buttonName={props.genre} onClick={props.genreChangeClick} buttonOptions={['Rock', 'Jazz', 'Ragtime']}></DropdownMenu>
+                    <DropdownMenu playing={props.playing} buttonName={props.genre} onClick={props.genreChangeClick} buttonOptions={props.genreOptions.split(',')}></DropdownMenu>
                 </td>
                 <td className="InfoField">
                     <text>Tempo</text>
@@ -35,8 +35,12 @@ export const LiveInfoBar = (props) => {
                     <DropdownMenu playing={props.playing} buttonName={props.keyQuality} onClick={props.keyQualityClick} buttonOptions={['Major', 'Minor']}></DropdownMenu>
                 </td>
                 <td className="InfoField">
-                    <text>Randomness</text>
-                    <CounterTextField playing={props.playing} input={props.randomness} min='0' max='10'></CounterTextField>
+                    <text>Number of Chords</text>
+                    <CounterTextField playing={props.playing} onChange={props.setNumChords} input={props.numChords} min='0' max='10'></CounterTextField>
+                </td>
+                <td className="InfoField">
+                    <text>Beats per Chord</text>
+                    <CounterTextField playing={props.playing} onChange={props.setChordLength} input={props.chordLength} min='1' max='128'></CounterTextField>
                 </td>
             </tr>
         </table>

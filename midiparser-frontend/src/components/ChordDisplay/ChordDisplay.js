@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import './ChordDisplay.css';
 
 export const ChordDisplay = (props) => {
-    return <div className="Container">
+    return <div className="LiveTopContainer">
         <div className="ChordContainer">
             <div className="ChordHeader">
                 <text>Current Chord</text>

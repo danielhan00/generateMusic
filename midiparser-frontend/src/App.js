@@ -27,7 +27,7 @@ function App() {
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
         <Routes>
-          <Route path="/liveperformance" element={<LivePerformanceTool chordName="Amaj"/>}>
+          <Route path="/liveperformance" element={<LivePerformanceTool/>}>
           </Route>
           <Route path="/songwriting" element={<SongWritingTool/>}>
           </Route>

@@ -1,6 +1,8 @@
 .LiveBottomContainer {
     display: inline-block;
     vertical-align: top;
+    width: 100vw;
+    height: 20vh;
 }
 
 .InfoBar {
@@ -27,7 +29,9 @@
 
 .MeasureText {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 132px;
+    font-size: 122px;
+    padding-right: 0;
+    padding-bottom: 0;
     color: white;
 }
 
