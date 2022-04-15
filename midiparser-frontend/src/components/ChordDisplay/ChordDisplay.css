@@ -2,6 +2,7 @@
     text-align: center;
     vertical-align: center;
     padding-top:15vh;
+    padding-right:0;
     font-size: 132px;
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
@@ -10,6 +11,7 @@
     text-align: center;
     vertical-align: top;
     font-size: 66px;
+    padding-right: 0;
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
@@ -21,7 +23,7 @@
 }
 
 .LiveTopContainer {
-    width: 10vw;
+    width: 100vw;
     height: 69vh;
     vertical-align: top;
 }

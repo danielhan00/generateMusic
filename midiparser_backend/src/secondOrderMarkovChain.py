@@ -2,7 +2,7 @@
 # Such that different status have chances (sum to 1) to transfer to the next status
 
 from typing import Any, Dict, List
-from Markov_Chain.status import Any, status
+from midiparser_backend.src.status import Any, status
 import random
 
 # -------------------------------------------------------------------------------------------------
@@ -331,7 +331,7 @@ class secondOrderMarkovChain():
         last_stat_existing_name = self._all_status.__getitem__(len(self._all_status) - 1).get_status_name()
         mc_copy = self.get_markov_chain()
 
-        with open('markov_chain_table.txt', 'w') as wf:
+        with open(self._genre_name + '_markov_chain_table.txt', 'w') as wf:
             wf.write(self._genre_name + '\n')
 
             if self._purpose:
