@@ -423,60 +423,35 @@ class secondOrderMarkovChain():
         self._happen_time_table = table_to_construct
         self.refresh_mc()
 
-        # TO READ A FILE AND TO GET THE MARKOV CHAIN
-        def read_markov_chain_from_file(self) -> Dict:
-            markov_to_construct: Dict[status, Dict[status, Dict[status, float]]] = {}
+    # TO READ A FILE AND TO GET THE MARKOV CHAIN
+    def read_markov_chain_from_file(self, genre: str) -> Dict:
+        markov_to_construct: Dict[status, Dict[status, Dict[status, float]]] = {}
 
-            with open('markov_chain_table', 'r') as rf:
-                lines = rf.readlines()
-                info_copy = []
-                status_involved = []
+        with open(genre + '_markov_chain_table.txt', 'r') as rf:
+            lines = rf.readlines()
+            info_copy = []
+            status_involved = []
 
-                current_line = 0
-                for oneline in lines:
-                    current_line = current_line + 1
-                    if current_line == 1:
-                        # Information of the genre
-                        self._genre_name = current_line
-                    elif current_line == 2:
-                        # Information of the purpose (for chords or for duration)
-                        if current_line == 'Chord':
-                            self._purpose = True
-                        elif current_line == 'Duration':
-                            self._purpose = False
-                        else:
-                            raise ValueError('Dude, you could only pass in Chord and Duration')
+            current_line = 0
+            for oneline in lines:
+                current_line = current_line + 1
+                if current_line == 1:
+                    # Information of the genre
+                    self._genre_name = current_line
+                elif current_line == 2:
+                    # Information of the purpose (for chords or for duration)
+                    if current_line == 'Chord':
+                        self._purpose = True
+                    elif current_line == 'Duration':
+                        self._purpose = False
                     else:
-                        # Information of the major content
-                        # Here, the system collect all the new status raised in the file
-                        one_event_info = str(current_line)
-                        info_copy.append(one_event_info)
+                        raise ValueError('Dude, you could only pass in Chord and Duration')
+                else:
+                    # Information of the major content
+                    # Here, the system collect all the new status raised in the file
+                    one_event_info = str(current_line)
+                    info_copy.append(one_event_info)
 
-                        first_stat_name = str(one_event_info[0])
-                        second_stat_name = str(one_event_info[1])
-                        third_stat_name = str(one_event_info[2])
-
-                        prev_prev_stat = status(first_stat_name)
-                        prev_stat = status(second_stat_name)
-                        next_stat = status(third_stat_name)
-
-                        if not status_involved.__contains__(prev_prev_stat):
-                            status_involved.append(prev_prev_stat)
-                        if not status_involved.__contains__(prev_stat):
-                            status_involved.append(prev_stat)
-                        if not status_involved.__contains__(next_stat):
-                            status_involved.append(next_stat)
-
-                for prev_prev in status_involved:
-                    prev_prev_table = {}
-                    for prev in status_involved:
-                        prev_table = {}
-                        for next_s in status_involved:
-                            prev_table[next_s] = 0.0
-                        prev_prev_table[prev] = prev_table
-                    markov_to_construct[prev_prev] = prev_prev_table
-
-                for oneTransition in info_copy:
                     first_stat_name = str(one_event_info[0])
                     second_stat_name = str(one_event_info[1])
                     third_stat_name = str(one_event_info[2])
@@ -485,11 +460,36 @@ class secondOrderMarkovChain():
                     prev_stat = status(second_stat_name)
                     next_stat = status(third_stat_name)
 
-                    happen_time = float(oneTransition[4:])
+                    if not status_involved.__contains__(prev_prev_stat):
+                        status_involved.append(prev_prev_stat)
+                    if not status_involved.__contains__(prev_stat):
+                        status_involved.append(prev_stat)
+                    if not status_involved.__contains__(next_stat):
+                        status_involved.append(next_stat)
 
-                    table_to_construct.get(prev_prev_stat).get(prev_stat)[next_stat] = happen_time
+            for prev_prev in status_involved:
+                prev_prev_table = {}
+                for prev in status_involved:
+                    prev_table = {}
+                    for next_s in status_involved:
+                        prev_table[next_s] = 0.0
+                    prev_prev_table[prev] = prev_table
+                markov_to_construct[prev_prev] = prev_prev_table
 
-            self._markov_chain_table = markov_to_construct
+            for oneTransition in info_copy:
+                first_stat_name = str(one_event_info[0])
+                second_stat_name = str(one_event_info[1])
+                third_stat_name = str(one_event_info[2])
+
+                prev_prev_stat = status(first_stat_name)
+                prev_stat = status(second_stat_name)
+                next_stat = status(third_stat_name)
+
+                happen_time = float(oneTransition[4:])
+
+                table_to_construct.get(prev_prev_stat).get(prev_stat)[next_stat] = happen_time
+
+        self._markov_chain_table = markov_to_construct
 
     # -----------------------------------------------------
     # -------------------- DISPLAYER ----------------------

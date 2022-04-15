@@ -18,42 +18,50 @@ def serve(path):
 api.add_resource(TestApi, '/flask/hello')
 # api.add_resource(MarkovApi, '/flask/getchords')
 
-# system for parsing csvs and creating markov chain
-print('running main')
-genre_map = {}
+def train_markov_chains():
+    # system for parsing csvs and creating markov chain
+    print('training markov chains')
+    genre_map = {}
 
-# to read the csv file
-file = open('midiparser_backend/dataWithRomanAndMode.csv')
-csvreader = csv.reader(file)
-header = next(csvreader)
-for row in csvreader:
-    genre = str(row[4]).replace('/', ' & ')
-    currMarkov = ""
-    # check if there is an existing markov chain, make one if not
-    if genre_map.keys().__contains__(genre):
-        currMarkov = genre_map.get(genre)
-    else:
-        currMarkov = secondOrderMarkovChain(genre, True)
+    # to read the csv file
+    file = open('midiparser_backend/dataWithRomanAndMode.csv')
+    csvreader = csv.reader(file)
+    header = next(csvreader)
+    for row in csvreader:
+        genre = str(row[4]).replace('/', ' & ')
+        currMarkov = ""
+        # check if there is an existing markov chain, make one if not
+        if genre_map.keys().__contains__(genre):
+            currMarkov = genre_map.get(genre)
+        else:
+            currMarkov = secondOrderMarkovChain(genre, True)
 
-    chords = row[8].split(',')
-    prev2Chord = None
-    prevChord = None
-    for chord in chords:
-        currMarkov.add_one_event(prev2Chord, prevChord, chord)
-        prevChord = chord
-        prev2Chord = prevChord
-        print(prev2Chord)
-        print(prevChord)
-        print(chord)
-    print(genre)
-    print(currMarkov)
-    #currMarkov.refresh_mc()
-    genre_map[genre] = currMarkov
+        chords = row[8].split(',')
+        prev2Chord = None
+        prevChord = None
+        for chord in chords:
+            currMarkov.add_one_event(prev2Chord, prevChord, chord)
+            prevChord = '' + chord
+            prev2Chord = '' + prevChord
+            print(prev2Chord)
+            print(prevChord)
+            print(chord)
+        print(genre)
+        print(currMarkov)
+        #currMarkov.refresh_mc()
+        genre_map[genre] = currMarkov
 
-for key in genre_map.keys():
-    genre_map.get(key).write_markov_chain_to_file()
-    genre_map.get(key).spit_out_all_possibility()
-    print(len(genre_map.get(key).get_happen_time_table()))
-    print(key)
-# create files for each markov chain
+    for key in genre_map.keys():
+        genre_map.get(key).write_markov_chain_to_file()
+        print(key)
+    # create files for each markov chain
+#train_markov_chains()
+
+def read_markov_chain(genre: str):
+    markovChain = secondOrderMarkovChain(genre, True)
+    markovChain.read_markov_chain_from_file(genre)
+    print(markovChain.run('i', 5))
+
+read_markov_chain('Classic Rock')
+
 
