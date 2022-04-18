@@ -3,13 +3,14 @@
 
 from typing import Any, Dict, List
 from midiparser_backend.src.status import Any, status
+#from Markov_Chain.status import Any, status
 import random
+
 
 # -------------------------------------------------------------------------------------------------
 class secondOrderMarkovChain():
     """To represent a second-order Markov Chain"""
 
-#READ FROM FILE
     # ----------------------------------- Fields ---------------------------------------
     _genre_name = ''
     """The genre that this 2-order Markov Chain is learning"""
@@ -19,6 +20,8 @@ class secondOrderMarkovChain():
     """All the status in this Markov Chain"""
     _happen_time_table: Dict[status, Dict[status, Dict[status, int]]]
     """How many times did transition from one status to another happened"""
+    # Note: all_status and happen_time_table are temporal tool to calculate the Markov Chain
+    # They are not required to always be equivalent to the Markov Chain
     _markov_chain_table: Dict[status, Dict[status, Dict[status, float]]]
     """The Markov Chain as the result"""
 
@@ -169,8 +172,8 @@ class secondOrderMarkovChain():
             outer_outer_update = {prev_prev_stat: prev_prev_stat_table_copy}
             self._happen_time_table.update(outer_outer_update)
 
-            # Refresh the Markov Chain
-            self.refresh_mc()
+            # Refresh the Markov Chain - MOVED TO THE END, OTHERWISE IT IS SO SLOW
+            # self.refresh_mc()
 
         else:
             raise ValueError('Hey! You cannot pass three NULL values')
@@ -180,16 +183,12 @@ class secondOrderMarkovChain():
         # We enlarge the table dimension-by-dimension
         for prev_prev_status in self._happen_time_table.keys():
             for prev_status in self._happen_time_table.get(prev_prev_status).keys():
-                #inner_update = {new_stat, 0}
-                #self._happen_time_table.get(prev_prev_status).get(prev_status).update(inner_update)
                 self._happen_time_table.get(prev_prev_status).get(prev_status)[new_stat] = 0
 
             update_1d: Dict[status, int]
             update_1d = {}
             for one_existing_status in self._all_status:
                 update_1d[one_existing_status] = 0
-            #outer_update = {new_stat, update_1d}
-            #self._happen_time_table.get(prev_prev_status).update(outer_update)
             self._happen_time_table.get(prev_prev_status)[new_stat] = update_1d
 
         update_2d: Dict[status, Dict[status, int]]
@@ -201,7 +200,32 @@ class secondOrderMarkovChain():
             update_2d[one_existing_prev] = this_existing_prev_table
         self._happen_time_table[new_stat] = update_2d
 
+    # To enlarge the 3D Markov Chain Table by adding one status
+    def enlarge_mc_table(self, new_stat: status) -> None:
+        all_status_involved = []
+        for one_existing_status in self._markov_chain_table.keys():
+            all_status_involved.append(one_existing_status)
+        all_status_involved.append(new_stat)
 
+        # We enlarge the table dimension-by-dimension
+        for prev_prev_status in self._markov_chain_table.keys():
+            for prev_status in self._markov_chain_table.get(prev_prev_status).keys():
+                self._markov_chain_table.get(prev_prev_status).get(prev_status)[new_stat] = 0.0
+
+            update_1d: Dict[status, float]
+            update_1d = {}
+            for one_existing_status in all_status_involved:
+                update_1d[one_existing_status] = 0.0
+            self._markov_chain_table.get(prev_prev_status)[new_stat] = update_1d
+
+        update_2d: Dict[status, Dict[status, float]]
+        update_2d = {}
+        for one_existing_prev in all_status_involved:
+            this_existing_prev_table = {}
+            for one_existing_next in all_status_involved:
+                this_existing_prev_table[one_existing_next] = 0
+            update_2d[one_existing_prev] = this_existing_prev_table
+        self._markov_chain_table[new_stat] = update_2d
 
     # To refresh the markov chain by the current happening-time table
     def refresh_mc(self) -> None:
@@ -242,6 +266,7 @@ class secondOrderMarkovChain():
     # -----------------------------------------------------
     # TO RUN THE SECOND-ORDER MARKOV CHAIN
     def run(self, starting_status: str, run_num: int) -> List[status]:
+        self.refresh_mc() # ADDED TO MAKE SURE
         result = []
         static_markov = self.get_markov_chain()
         current_stat = status(starting_status)
@@ -300,9 +325,10 @@ class secondOrderMarkovChain():
     # -----------------------------------------------------
     # TO WRITE THE CURRENT HAPPEN TIME TABLE TO A FILE
     def write_happen_time_table_to_file(self) -> None:
+        self.refresh_mc()  # ADDED TO MAKE SURE MC IS UP-TO-DATE
         last_stat_existing_name = self._all_status.__getitem__(len(self._all_status) - 1).get_status_name()
 
-        with open('happen_time_table.txt', 'w') as wf:  #Location
+        with open(self._genre_name + '_happen_time_table.txt', 'w') as wf:  # Location
             wf.write(self._genre_name + '\n')
 
             if self._purpose:
@@ -320,14 +346,15 @@ class secondOrderMarkovChain():
                         if ((prev_prev_stat.get_status_name() == last_stat_existing_name)
                             and (prev_stat.get_status_name() == last_stat_existing_name)
                             and (next_stat.get_status_name() == last_stat_existing_name)):
-                            wf.write(prev_prev_stat.get_status_name() + prev_stat.get_status_name()
-                                     + next_stat.get_status_name() + ':' + str(this_happen_time))
+                            wf.write(prev_prev_stat.get_status_name() + ',' + prev_stat.get_status_name()
+                                     + ',' + next_stat.get_status_name() + ':' + str(this_happen_time))
                         else:
-                            wf.write(prev_prev_stat.get_status_name() + prev_stat.get_status_name()
-                                     + next_stat.get_status_name() + ':' + str(this_happen_time) + '\n')
+                            wf.write(prev_prev_stat.get_status_name() + ',' + prev_stat.get_status_name()
+                                     + ',' + next_stat.get_status_name() + ':' + str(this_happen_time) + '\n')
 
     # TO WRITE THE CURRENT MARKOV CHAIN TO A FILE
     def write_markov_chain_to_file(self) -> None:
+        self.refresh_mc()  # ADDED TO MAKE SURE
         last_stat_existing_name = self._all_status.__getitem__(len(self._all_status) - 1).get_status_name()
         mc_copy = self.get_markov_chain()
 
@@ -348,148 +375,158 @@ class secondOrderMarkovChain():
                         if ((prev_prev_stat.get_status_name() == last_stat_existing_name)
                                 and (prev_stat.get_status_name() == last_stat_existing_name)
                                 and (next_stat.get_status_name() == last_stat_existing_name)):
-                            wf.write(prev_prev_stat.get_status_name() + prev_stat.get_status_name()
-                                     + next_stat.get_status_name() + ':' + str(this_possibility))
+                            wf.write(prev_prev_stat.get_status_name() + ',' + prev_stat.get_status_name()
+                                     + ',' + next_stat.get_status_name() + ':' + str(this_possibility))
                         else:
-                            wf.write(prev_prev_stat.get_status_name() + prev_stat.get_status_name()
-                                     + next_stat.get_status_name() + ':' + str(this_possibility) + '\n')
+                            wf.write(prev_prev_stat.get_status_name() + ',' + prev_stat.get_status_name()
+                                     + ',' + next_stat.get_status_name() + ':' + str(this_possibility) + '\n')
 
     # TO READ A FILE AND TO GET THE HAPPEN-TIME TABLE
-    def read_happen_time_table_from_file(self) -> None:
-        table_to_construct: Dict[status, Dict[status, Dict[status, int]]] = {}
+    def read_happen_time_table_from_file(self, genre_name: str) -> None:
+        # Everything in the Markov Chain is refreshed
+        self._all_status = []
+        self._happen_time_table = {}
+        self._markov_chain_table = {}
 
-        with open('happen_time_table', 'r') as rf:
+        # Read from file
+        with open(genre_name + '_happen_time_table.txt', 'r') as rf:
             lines = rf.readlines()
-            info_copy = []
-            status_involved = []
+            current_line_num = 0
 
-            current_line = 0
+            # Read each line
             for oneline in lines:
-                current_line = current_line + 1
-                if current_line == 1:
+                current_line_num = current_line_num + 1
+
+                if current_line_num == 1:
                     # Information of the genre
-                    self._genre_name = current_line
-                elif current_line == 2:
+                    self._genre_name = str(oneline)
+
+                elif current_line_num == 2:
                     # Information of the purpose (for chords or for duration)
-                    if current_line == 'Chord':
+                    if str(oneline) == 'Chord' or str(oneline) == 'Chord\n':
                         self._purpose = True
-                    elif current_line == 'Duration':
+                    elif str(oneline) == 'Duration' or str(oneline) == 'Duration\n':
                         self._purpose = False
                     else:
-                        raise ValueError('Dude, you could only pass in Chord and Duration')
+                        raise ValueError('Dude, you could only pass in Chord or Duration')
+
                 else:
                     # Information of the major content
                     # Here, the system collect all the new status raised in the file
-                    one_event_info = str(current_line)
-                    info_copy.append(one_event_info)
+                    one_event_info = str(oneline)
 
-                    first_stat_name = str(one_event_info[0])
-                    second_stat_name = str(one_event_info[1])
-                    third_stat_name = str(one_event_info[2])
+                    first_comma_position = 0
+                    second_comma_position = 0
+                    column_position = 0
+                    end_position = 0
 
-                    prev_prev_stat = status(first_stat_name)
-                    prev_stat = status(second_stat_name)
-                    next_stat = status(third_stat_name)
+                    first_comma_found = False
+                    second_comma_found = False
 
-                    if not status_involved.__contains__(prev_prev_stat):
-                        status_involved.append(prev_prev_stat)
-                    if not status_involved.__contains__(prev_stat):
-                        status_involved.append(prev_stat)
-                    if not status_involved.__contains__(next_stat):
-                        status_involved.append(next_stat)
+                    current_char_position = 0
+                    for one_letter in one_event_info:
+                        if one_letter == ',':
+                            if (not first_comma_found) and (not second_comma_found):
+                                first_comma_position = current_char_position
+                                first_comma_found = True
+                            else:
+                                second_comma_position = current_char_position
+                                second_comma_found = True
+                        if one_letter == ':' and first_comma_found and second_comma_found:
+                            column_position = current_char_position
 
-            for prev_prev in status_involved:
-                prev_prev_table = {}
-                for prev in status_involved:
-                    prev_table = {}
-                    for next_s in status_involved:
-                        prev_table[next_s] = 0
-                    prev_prev_table[prev] = prev_table
-                table_to_construct[prev_prev] = prev_prev_table
+                        current_char_position = current_char_position + 1
+                    end_position = current_char_position
 
-            for oneTransition in info_copy:
-                first_stat_name = str(one_event_info[0])
-                second_stat_name = str(one_event_info[1])
-                third_stat_name = str(one_event_info[2])
+                    prev_prev_stat_name = one_event_info[0:first_comma_position]
+                    prev_stat_name = one_event_info[(first_comma_position + 1):second_comma_position]
+                    next_stat_name = one_event_info[(second_comma_position + 1):column_position]
+                    this_transition_happen_time = int(one_event_info[(column_position + 1):end_position])
 
-                prev_prev_stat = status(first_stat_name)
-                prev_stat = status(second_stat_name)
-                next_stat = status(third_stat_name)
+                    add_event_count = 0
+                    while add_event_count < this_transition_happen_time:
+                        self.add_one_event(prev_prev_stat_name, prev_stat_name, next_stat_name)
+                        add_event_count = add_event_count + 1
 
-                happen_time = int(oneTransition[4:])
-
-                table_to_construct.get(prev_prev_stat).get(prev_stat)[next_stat] = happen_time
-
-        self._happen_time_table = table_to_construct
         self.refresh_mc()
 
     # TO READ A FILE AND TO GET THE MARKOV CHAIN
-    def read_markov_chain_from_file(self, genre: str) -> Dict:
-        markov_to_construct: Dict[status, Dict[status, Dict[status, float]]] = {}
+    def read_markov_chain_from_file(self, genre_name: str) -> None:
+        # This time, the happen_time_table is not going to be refreshed
+        # We first erase the original Markov Chain
+        self._markov_chain_table = {}
+        all_status_involved = []
 
-        with open(genre + '_markov_chain_table.txt', 'r') as rf:
+        with open(genre_name + '_markov_chain_table.txt', 'r') as rf:
             lines = rf.readlines()
-            info_copy = []
-            status_involved = []
+            current_line_num = 0
 
-            current_line = 0
+            # Read each line
             for oneline in lines:
-                current_line = current_line + 1
-                if current_line == 1:
+                current_line_num = current_line_num + 1
+
+                if current_line_num == 1:
                     # Information of the genre
-                    self._genre_name = current_line
-                elif current_line == 2:
+                    self._genre_name = str(oneline)
+
+                elif current_line_num == 2:
                     # Information of the purpose (for chords or for duration)
-                    if current_line == 'Chord':
+                    if str(oneline) == 'Chord' or str(oneline) == 'Chord\n':
                         self._purpose = True
-                    elif current_line == 'Duration':
+                    elif str(oneline) == 'Duration' or str(oneline) == 'Duration\n':
                         self._purpose = False
                     else:
-                        raise ValueError('Dude, you could only pass in Chord and Duration')
+                        raise ValueError('Dude, you could only pass in Chord or Duration')
+
                 else:
                     # Information of the major content
                     # Here, the system collect all the new status raised in the file
-                    one_event_info = str(current_line)
-                    info_copy.append(one_event_info)
+                    one_event_info = str(oneline)
 
-                    first_stat_name = str(one_event_info[0])
-                    second_stat_name = str(one_event_info[1])
-                    third_stat_name = str(one_event_info[2])
+                    first_comma_position = 0
+                    second_comma_position = 0
+                    column_position = 0
+                    end_position = 0
 
-                    prev_prev_stat = status(first_stat_name)
-                    prev_stat = status(second_stat_name)
-                    next_stat = status(third_stat_name)
+                    first_comma_found = False
+                    second_comma_found = False
 
-                    if not status_involved.__contains__(prev_prev_stat):
-                        status_involved.append(prev_prev_stat)
-                    if not status_involved.__contains__(prev_stat):
-                        status_involved.append(prev_stat)
-                    if not status_involved.__contains__(next_stat):
-                        status_involved.append(next_stat)
+                    current_char_position = 0
+                    for one_letter in one_event_info:
+                        if one_letter == ',':
+                            if (not first_comma_found) and (not second_comma_found):
+                                first_comma_position = current_char_position
+                                first_comma_found = True
+                            else:
+                                second_comma_position = current_char_position
+                                second_comma_found = True
+                        if one_letter == ':' and first_comma_found and second_comma_found:
+                            column_position = current_char_position
 
-            for prev_prev in status_involved:
-                prev_prev_table = {}
-                for prev in status_involved:
-                    prev_table = {}
-                    for next_s in status_involved:
-                        prev_table[next_s] = 0.0
-                    prev_prev_table[prev] = prev_table
-                markov_to_construct[prev_prev] = prev_prev_table
+                        current_char_position = current_char_position + 1
+                    end_position = current_char_position
 
-            for oneTransition in info_copy:
-                first_stat_name = str(one_event_info[0])
-                second_stat_name = str(one_event_info[1])
-                third_stat_name = str(one_event_info[2])
+                    prev_prev_stat_name = one_event_info[0:first_comma_position]
+                    prev_stat_name = one_event_info[(first_comma_position + 1):second_comma_position]
+                    next_stat_name = one_event_info[(second_comma_position + 1):column_position]
+                    this_transition_possibility = float(one_event_info[(column_position + 1):end_position])
 
-                prev_prev_stat = status(first_stat_name)
-                prev_stat = status(second_stat_name)
-                next_stat = status(third_stat_name)
+                    prev_prev_stat = status(prev_prev_stat_name)
+                    prev_stat = status(prev_stat_name)
+                    next_stat = status(next_stat_name)
 
-                happen_time = float(oneTransition[4:])
+                    # Add this to the markov table
+                    if not all_status_involved.__contains__(prev_prev_stat):
+                        self.enlarge_mc_table(prev_prev_stat)
+                        all_status_involved.append(prev_prev_stat)
+                    if not all_status_involved.__contains__(prev_stat):
+                        self.enlarge_mc_table(prev_stat)
+                        all_status_involved.append(prev_stat)
+                    if not all_status_involved.__contains__(next_stat):
+                        self.enlarge_mc_table(next_stat)
+                        all_status_involved.append(next_stat)
 
-                table_to_construct.get(prev_prev_stat).get(prev_stat)[next_stat] = happen_time
-
-        self._markov_chain_table = markov_to_construct
+                    self._markov_chain_table.get(prev_prev_stat).get(prev_stat)[next_stat] = this_transition_possibility
 
     # -----------------------------------------------------
     # -------------------- DISPLAYER ----------------------
