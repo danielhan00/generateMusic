@@ -1,3 +1,4 @@
+from urllib.parse import MAX_CACHE_SIZE
 from flask import Flask, send_from_directory
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS  # comment this on deployment
@@ -60,8 +61,10 @@ def train_markov_chains():
 def read_markov_chain(genre: str):
     markovChain = secondOrderMarkovChain(genre, True)
     markovChain.read_markov_chain_from_file(genre)
+    print(len(markovChain.get_all_status()))
+    markovChain.spit_out_all_possibility()
     print(markovChain.run('i', 5))
 
-read_markov_chain('Classic Rock')
+read_markov_chain('Dance')
 
 

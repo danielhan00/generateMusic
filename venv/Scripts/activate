@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\gcoop\OneDrive\Documents\Fall 2021 Classes\Composition for Electric Instruments\midiParser\venv"
+VIRTUAL_ENV="C:\KEVIN GAO\NU\9, 2022 Spring\MUST4611 - CAPSTONE\Project B - Music Markov Chain\Group Project\midiParser\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

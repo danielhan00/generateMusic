@@ -266,7 +266,7 @@ class secondOrderMarkovChain():
     # -----------------------------------------------------
     # TO RUN THE SECOND-ORDER MARKOV CHAIN
     def run(self, starting_status: str, run_num: int) -> List[status]:
-        self.refresh_mc() # ADDED TO MAKE SURE
+        # self.refresh_mc() # ADDED TO MAKE SURE
         result = []
         static_markov = self.get_markov_chain()
         current_stat = status(starting_status)
@@ -460,7 +460,8 @@ class secondOrderMarkovChain():
         with open(genre_name + '_markov_chain_table.txt', 'r') as rf:
             lines = rf.readlines()
             current_line_num = 0
-
+            print('fdghj')
+            
             # Read each line
             for oneline in lines:
                 current_line_num = current_line_num + 1
@@ -516,17 +517,20 @@ class secondOrderMarkovChain():
                     next_stat = status(next_stat_name)
 
                     # Add this to the markov table
-                    if not all_status_involved.__contains__(prev_prev_stat):
+                    if not self._all_status.__contains__(prev_prev_stat):
                         self.enlarge_mc_table(prev_prev_stat)
-                        all_status_involved.append(prev_prev_stat)
-                    if not all_status_involved.__contains__(prev_stat):
+                        self._all_status.append(prev_prev_stat)
+                    if not self._all_status.__contains__(prev_stat):
                         self.enlarge_mc_table(prev_stat)
-                        all_status_involved.append(prev_stat)
-                    if not all_status_involved.__contains__(next_stat):
+                        self._all_status.append(prev_stat)
+                    if not self._all_status.__contains__(next_stat):
                         self.enlarge_mc_table(next_stat)
-                        all_status_involved.append(next_stat)
-
+                        self._all_status.append(next_stat)
+                    
+                    print('Length of MC:')
+                    print(len(self._markov_chain_table.keys()))
                     self._markov_chain_table.get(prev_prev_stat).get(prev_stat)[next_stat] = this_transition_possibility
+                    print('refreshed')
 
     # -----------------------------------------------------
     # -------------------- DISPLAYER ----------------------
