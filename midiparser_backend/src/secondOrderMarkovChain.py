@@ -265,9 +265,15 @@ class secondOrderMarkovChain():
     # -------------------- THE RUNNER ---------------------
     # -----------------------------------------------------
     # TO RUN THE SECOND-ORDER MARKOV CHAIN
-    def run(self, starting_status: str, run_num: int) -> List[status]:
+    def run(self, run_num: int) -> List[status]:
         # self.refresh_mc() # ADDED TO MAKE SURE
         result = []
+        
+        # Randomly select a starting status 
+        all_starting_stat = self._markov_chain_table.keys();   
+        random_index = random.randint(0, (len(all_starting_stat) - 1)) 
+        starting_status = all_starting_stat[random_index]
+        
         static_markov = self.get_markov_chain()
         current_stat = status(starting_status)
         previous_stat = status(starting_status)
