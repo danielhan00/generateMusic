@@ -92,7 +92,7 @@ def train_markov_chains():
         genre_map[genre] = currMarkov
 
     for key in genre_map.keys():
-        genre_map.get(key).write_markov_chain_to_file()
+        #genre_map.get(key).write_markov_chain_to_file()
         print(key)
     # create files for each markov chain
 train_markov_chains()
