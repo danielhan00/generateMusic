@@ -49,8 +49,8 @@ export const LivePerformanceTool = (props) => {
             }).then(response => {
                 console.log("SUCCESS", response)
                 setChordMessage(response)
-                setCurrChord((chordMessage.data.chords)[0])
-                setNextChord((chordMessage.data.chords)[1])
+                setCurrChord((response.data.chords)[0])
+                setNextChord((response.data.chords)[1])
             }).catch(error => {
                 console.log(error)
             })

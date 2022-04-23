@@ -33,7 +33,7 @@ def generalize_genres(genre: str):
     elif (genre == 'Pop' or genre == 'Easy Listening' or genre == 'Pop & Rock' or genre == 'Singer & Songwriter'):
         return 'Pop'
     elif (genre == 'Christian Rock' or genre == 'Inspirational' or genre == 'Praise & Worship'):
-        return "Religious Music"
+        return "Religious"
     elif (genre == 'Dance' or genre == 'Dance & Electronic' or genre == 'Disco' or genre == 'House' or genre == 'Electronic'):
         return "Dance & EDM"
     elif (genre == 'Jazz' or genre == 'Vocal Jazz'):
