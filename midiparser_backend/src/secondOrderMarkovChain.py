@@ -2,8 +2,8 @@
 # Such that different status have chances (sum to 1) to transfer to the next status
 
 from typing import Any, Dict, List
-from midiparser_backend.src.status import Any, status
-#from Markov_Chain.status import Any, status
+#from midiparser_backend.src.status import Any, status
+from Markov_Chain.status import Any, status
 import random
 
 
@@ -268,11 +268,14 @@ class secondOrderMarkovChain():
     def run(self, run_num: int) -> List[str]:
         self.refresh_mc() # ADDED TO MAKE SURE
         result = []
-        
-        # Randomly select a starting status 
-        all_starting_stat = self._markov_chain_table.keys();   
-        starting_status = random.choice(list(all_starting_stat))
-        
+
+        # Randomly select a starting status
+        all_starting_stat = []
+        for one_stat in self._markov_chain_table.keys():
+            all_starting_stat.append(one_stat)
+        random_index = random.randint(0, (len(all_starting_stat) - 1))
+        starting_status = all_starting_stat[random_index]
+
         static_markov = self.get_markov_chain()
         current_stat = starting_status
         previous_stat = starting_status
@@ -468,8 +471,7 @@ class secondOrderMarkovChain():
         with open(genre_name + '_markov_chain_table.txt', 'r') as rf:
             lines = rf.readlines()
             current_line_num = 0
-            print('fdghj')
-            
+
             # Read each line
             for oneline in lines:
                 current_line_num = current_line_num + 1
@@ -525,20 +527,17 @@ class secondOrderMarkovChain():
                     next_stat = status(next_stat_name)
 
                     # Add this to the markov table
-                    if not self._all_status.__contains__(prev_prev_stat):
+                    if not all_status_involved.__contains__(prev_prev_stat):
                         self.enlarge_mc_table(prev_prev_stat)
-                        self._all_status.append(prev_prev_stat)
-                    if not self._all_status.__contains__(prev_stat):
+                        all_status_involved.append(prev_prev_stat)
+                    if not all_status_involved.__contains__(prev_stat):
                         self.enlarge_mc_table(prev_stat)
-                        self._all_status.append(prev_stat)
-                    if not self._all_status.__contains__(next_stat):
+                        all_status_involved.append(prev_stat)
+                    if not all_status_involved.__contains__(next_stat):
                         self.enlarge_mc_table(next_stat)
-                        self._all_status.append(next_stat)
-                    
-                    print('Length of MC:')
-                    print(len(self._markov_chain_table.keys()))
+                        all_status_involved.append(next_stat)
+
                     self._markov_chain_table.get(prev_prev_stat).get(prev_stat)[next_stat] = this_transition_possibility
-                    print('refreshed')
 
     # -----------------------------------------------------
     # -------------------- DISPLAYER ----------------------
