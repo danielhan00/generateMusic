@@ -108,7 +108,7 @@ genre_map.get('Rock_Minor').run(5)
 class livePerformanceApi(Resource):
   def get(self):
     print('in api get')
-    genreOptions = list(genre_names())
+    genreOptions = list(genre_names)
     genresString =''
     for i in range(len(genreOptions)):
         genresString += genreOptions[i]

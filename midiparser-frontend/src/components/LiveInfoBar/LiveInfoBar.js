@@ -3,6 +3,7 @@ import { CounterTextField } from '../reusable/CounterTextField/CounterTextField'
 import { DropdownMenu } from '../reusable/DropdownMenu/DropdownMenu';
 import { TimeSignatureInput } from '../reusable/TimeSignatureInput/TimeSignatureInput';
 import { PlayButton } from '../reusable/PlayButton/PlayButton';
+import { AButton } from '../reusable/AButton/AButton'
 import './LiveInfoBar.css';
 
 export const LiveInfoBar = (props) => {
@@ -37,10 +38,12 @@ export const LiveInfoBar = (props) => {
                 <td className="InfoField">
                     <text>Number of Chords</text>
                     <CounterTextField playing={props.playing} onChange={props.setNumChords} input={props.numChords} min='0' max='10'></CounterTextField>
-                </td>
-                <td className="InfoField">
+                    <p></p>
                     <text>Beats per Chord</text>
                     <CounterTextField playing={props.playing} onChange={props.setChordLength} input={props.chordLength} min='1' max='128'></CounterTextField>
+                </td>
+                <td className="InfoField">
+                    <AButton playing={props.playing} onClick={props.changeChords} clickVar={props.currChordProg} buttonName="Change Chords"></AButton> 
                 </td>
             </tr>
         </table>
