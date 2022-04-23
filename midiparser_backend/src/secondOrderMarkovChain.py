@@ -2,8 +2,8 @@
 # Such that different status have chances (sum to 1) to transfer to the next status
 
 from typing import Any, Dict, List
-#from midiparser_backend.src.status import Any, status
-from Markov_Chain.status import Any, status
+from midiparser_backend.src.status import Any, status
+#from Markov_Chain.status import Any, status
 import random
 
 
