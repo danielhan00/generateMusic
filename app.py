@@ -5,7 +5,7 @@ from flask_cors import CORS  # comment this on deployment
 from api.TestApi import TestApi
 #from livePerformanceApi import livePerformanceApi
 from midiparser_backend.src.secondOrderMarkovChain import Any, secondOrderMarkovChain
-from midiparser_backend.src.parse import findAllChords
+from midiparser_backend.src.markovUtility import findAllChords
 import csv
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/build')
@@ -23,6 +23,7 @@ api.add_resource(TestApi, '/flask/hello')
 
 #Methods for training and reading markov chains
 
+# generalizes genres to make larger markov chains for groups of genres
 def generalize_genres(genre: str):
     if (genre == 'Acoustic Blues' or genre == 'Blues & Folk' or genre == 'Blues-Rock' or genre == 'Soul' or genre == 'R&B & Soul'):
         return 'R&B & Soul'
@@ -50,6 +51,7 @@ def generalize_genres(genre: str):
     else:
         return genre
 
+# method for training markov chains at the start of application, stores genre names in genre_names and all markov chains in genre_map
 def train_markov_chains():
     # system for parsing csvs and creating markov chain
     print('training markov chains')
@@ -63,17 +65,18 @@ def train_markov_chains():
         # add genre to set for retrieval from front end
         genre_names.add(genre)
 
+        # get tonality from csv
         tonality = str(row[9])
         currMarkov = ""
         # merge genre and tonality so markov chains are separate for major and minor
         genre_tonality = genre + '_' + tonality
-        print(genre_tonality)
         # check if there is an existing markov chain, make one if not
         if genre_map.keys().__contains__(genre_tonality):
             currMarkov = genre_map.get(genre_tonality)
         else:
             currMarkov = secondOrderMarkovChain(genre_tonality, True)
 
+        # train markov chain with chords from current song
         chords = row[8].split(',')
         prev2Chord = None
         prevChord = None
@@ -81,18 +84,17 @@ def train_markov_chains():
             currMarkov.add_one_event(prev2Chord, prevChord, chord)
             prevChord = '' + chord
             prev2Chord = '' + prevChord
-        #print(genre)
-        #print(currMarkov)
-        #currMarkov.refresh_mc()
         genre_map[genre_tonality] = currMarkov
 
     for key in genre_names:
+        # markov chains are not written because of inefficiency
         #genre_map[key + '_Major'].write_markov_chain_to_file()
         #genre_map[key + '_Minor'].write_markov_chain_to_file()
         print(key)
-    # create files for each markov chain
 train_markov_chains()
+#print(findAllChords('A', genre_map.get('Rock_Minor').run(5)))
 
+# NOT USED: reading markov chain takes too long
 def read_markov_chain(genre: str):
     markovChain = secondOrderMarkovChain(genre, True)
     markovChain.read_markov_chain_from_file(genre)
@@ -100,10 +102,7 @@ def read_markov_chain(genre: str):
     #markovChain.spit_out_all_possibility()
     print(markovChain.run('im', 5))
 
-#read_markov_chain('Dance')
-print('trying to run from global variable')
-#genre_map.get('Dance').run('im', 3)
-print(findAllChords('A', genre_map.get('Rock_Minor').run(5)))
+
 
 #LIVE PERFORMANCE API
 class livePerformanceApi(Resource):
@@ -122,20 +121,17 @@ class livePerformanceApi(Resource):
       }
 
   def post(self):
-    print(self)
+    # parse post request from js
     parser = reqparse.RequestParser()
     parser.add_argument('genre', type=str)
     parser.add_argument('key', type=str)
     parser.add_argument('tonality', type=str)
     parser.add_argument('numChords', type=int)
     parser.add_argument('melodyNotes', type=list)
-
     args = parser.parse_args()
-    # note, the post req from frontend needs to match the strings here
-    # manual starting chord waiting for revised run method
 
+    # try to create chords using the data from js request
     try:
-        print(genre_map.get(args.genre + '_' + args.tonality))
         chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords))
         return {
             'resultStatus': 'SUCCESS',
@@ -144,7 +140,7 @@ class livePerformanceApi(Resource):
     except:
         return {
             'resultStatus': 'FAILURE',
-            'chords': 'Request Failed, Try Again'
+            'chords': ['Request', 'Failed']
         }
 
 api.add_resource(livePerformanceApi, '/flask/getchords')

@@ -10,6 +10,9 @@ export const ChordDisplay = (props) => {
             <div className="ChordText">
                 <text>{props.chordName}</text>
             </div>
+            <div className='ProgressionText'>
+                <text>{"Chord Progression: " + props.progression.join(", ").toString()}</text>
+            </div>
         </div>
         <div className="NextChordContainer">
             <div className="ChordHeader">
