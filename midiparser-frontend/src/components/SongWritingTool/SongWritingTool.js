@@ -3,6 +3,7 @@ import { TransportBar } from "../TransportBar/TransportBar";
 import { MidiInput } from "../MidiInput/MidiInput";
 import './SongWritingTool.css'
 
+
 export const SongWritingTool =(props)=>{
 
     const [genre, setGenre] = useState('Placeholder');
