@@ -5,8 +5,8 @@ from flask_cors import CORS  # comment this on deployment
 from api.TestApi import TestApi
 #from livePerformanceApi import livePerformanceApi
 from midiparser_backend.src.secondOrderMarkovChain import Any, secondOrderMarkovChain
+from midiparser_backend.src.parse import findAllChords
 import csv
-import json
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/build')
 CORS(app)  # comment this on deployment
@@ -30,7 +30,7 @@ def generalize_genres(genre: str):
     or genre == 'Rock' or genre == 'Rock & Roll' or genre == 'Southern Rock' or genre == 'Folk-Rock'
     or genre == 'Hard Rock' or genre == 'Ska' or genre == 'Classic Rock' or genre == 'Country'):
         return 'Rock'
-    elif (genre == 'Pop' or genre == 'Easy Listening' or genre == 'Pop & Rock' or genre == 'Singer & Songwriter'):
+    elif (genre == 'Pop' or genre == 'Easy Listening' or genre == 'Pop & Rock' or genre == 'Singer & Songwriter' or genre == 'My Super Sweet 16' or genre == 'Latin'):
         return 'Pop'
     elif (genre == 'Christian Rock' or genre == 'Inspirational' or genre == 'Praise & Worship'):
         return "Religious"
@@ -67,7 +67,7 @@ def train_markov_chains():
         currMarkov = ""
         # merge genre and tonality so markov chains are separate for major and minor
         genre_tonality = genre + '_' + tonality
-
+        print(genre_tonality)
         # check if there is an existing markov chain, make one if not
         if genre_map.keys().__contains__(genre_tonality):
             currMarkov = genre_map.get(genre_tonality)
@@ -87,7 +87,8 @@ def train_markov_chains():
         genre_map[genre_tonality] = currMarkov
 
     for key in genre_names:
-        #genre_map.get(key).write_markov_chain_to_file()
+        #genre_map[key + '_Major'].write_markov_chain_to_file()
+        #genre_map[key + '_Minor'].write_markov_chain_to_file()
         print(key)
     # create files for each markov chain
 train_markov_chains()
@@ -102,7 +103,7 @@ def read_markov_chain(genre: str):
 #read_markov_chain('Dance')
 print('trying to run from global variable')
 #genre_map.get('Dance').run('im', 3)
-genre_map.get('Rock_Minor').run(5)
+print(findAllChords('A', genre_map.get('Rock_Minor').run(5)))
 
 #LIVE PERFORMANCE API
 class livePerformanceApi(Resource):
@@ -127,16 +128,15 @@ class livePerformanceApi(Resource):
     parser.add_argument('key', type=str)
     parser.add_argument('tonality', type=str)
     parser.add_argument('numChords', type=int)
+    parser.add_argument('melodyNotes', type=list)
 
     args = parser.parse_args()
-
-    print(args)
     # note, the post req from frontend needs to match the strings here
     # manual starting chord waiting for revised run method
 
     try:
         print(genre_map.get(args.genre + '_' + args.tonality))
-        chords = genre_map.get(args.genre + '_' + args.tonality).run(args.numChords)
+        chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords))
         return {
             'resultStatus': 'SUCCESS',
             'chords': chords,

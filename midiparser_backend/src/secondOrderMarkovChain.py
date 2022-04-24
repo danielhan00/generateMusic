@@ -265,7 +265,7 @@ class secondOrderMarkovChain():
     # -------------------- THE RUNNER ---------------------
     # -----------------------------------------------------
     # TO RUN THE SECOND-ORDER MARKOV CHAIN
-    def run(self, run_num: int) -> List[str]:
+    def run(self, run_num: int, melody_notes: list=[]) -> List[str]:
         self.refresh_mc() # ADDED TO MAKE SURE
         result = []
 
@@ -274,7 +274,8 @@ class secondOrderMarkovChain():
         for one_stat in self._markov_chain_table.keys():
             all_starting_stat.append(one_stat)
         random_index = random.randint(0, (len(all_starting_stat) - 1))
-        starting_status = all_starting_stat[random_index]
+        # check if fits in melody, otherwise generate a different chord
+        starting_status = status('i') #all_starting_stat[random_index]
 
         static_markov = self.get_markov_chain()
         current_stat = starting_status
@@ -282,44 +283,50 @@ class secondOrderMarkovChain():
 
         result.append(current_stat)
         print(current_stat.get_status_name(), end=" ")
+        chord_fits_melody = False
 
         attempt = 0
-        while attempt < run_num:
+        while attempt < run_num - 1:
             current_stat_possibility_chart: Dict[status, float]
+            # add while loop here to check if generated chord fits with melody notes
+            chord_fits_melody = False
+            while not chord_fits_melody:
+                if attempt == 0:
+                    # We come up with the average possibility to transfer to other states
+                    current_stat_possibility_chart = {}
 
-            if attempt == 0:
-                # We come up with the average possibility to transfer to other states
-                current_stat_possibility_chart = {}
+                    for next_stat_to_spit in static_markov.keys():
+                        average_possibility = 0.0
+                        factor = 0.0
 
-                for next_stat_to_spit in static_markov.keys():
-                    average_possibility = 0.0
-                    factor = 0.0
+                        for prev_prev_stat in static_markov.keys():
+                            this_prev_prev_possibility = static_markov.get(prev_prev_stat).get(current_stat)\
+                                .get(next_stat_to_spit)
+                            average_possibility = average_possibility + this_prev_prev_possibility
+                            factor = factor + 1.0
 
-                    for prev_prev_stat in static_markov.keys():
-                        this_prev_prev_possibility = static_markov.get(prev_prev_stat).get(current_stat)\
-                            .get(next_stat_to_spit)
-                        average_possibility = average_possibility + this_prev_prev_possibility
-                        factor = factor + 1.0
+                        average_possibility = average_possibility / factor
+                        current_stat_possibility_chart[next_stat_to_spit] = average_possibility
 
-                    average_possibility = average_possibility / factor
-                    current_stat_possibility_chart[next_stat_to_spit] = average_possibility
+                else:
+                    current_stat_possibility_chart = static_markov.get(previous_stat).get(current_stat)
 
-            else:
-                current_stat_possibility_chart = static_markov.get(previous_stat).get(current_stat)
+                all_next_stat = list(current_stat_possibility_chart.keys())
+                all_next_stat_possibility = list(current_stat_possibility_chart.values())
 
-            all_next_stat = list(current_stat_possibility_chart.keys())
-            all_next_stat_possibility = list(current_stat_possibility_chart.values())
+                # Get the next status using the current Markov Model
+                rand = random.random()
+                get_stat_attempt = 0
+                while rand > 0:
+                    rand = rand - all_next_stat_possibility[get_stat_attempt]
+                    get_stat_attempt = get_stat_attempt + 1
 
-            # Get the next status using the current Markov Model
-            rand = random.random()
-            get_stat_attempt = 0
-            while rand > 0:
-                rand = rand - all_next_stat_possibility[get_stat_attempt]
-                get_stat_attempt = get_stat_attempt + 1
-
-            previous_stat = current_stat
-            current_stat = all_next_stat[get_stat_attempt - 1]
-
+                previous_stat = current_stat
+                current_stat = all_next_stat[get_stat_attempt - 1]
+                chord_fits_melody = True
+                #check if melody notes exist
+                #chord_fits_melody = #helper method to check if fits(melody_notes[attempt], current_stat)
+            #while loop ends
             print(current_stat.get_status_name(), end=" ")
             result.append(current_stat)
 
