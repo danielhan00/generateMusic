@@ -28,7 +28,7 @@ export const LiveInfoBar = (props) => {
                 </td>
                 <td className="InfoField">
                     <text>Key</text>
-                    <DropdownMenu playing={props.playing} buttonName={props.keyLetter} onClick={props.keyLetterClick} buttonOptions={['A', 'B', 'C', 'D', 'E', 'F', 'G']}></DropdownMenu>
+                    <DropdownMenu playing={props.playing} buttonName={props.keyLetter} onClick={props.keyLetterClick} buttonOptions={['Ab', 'A', 'Bb', 'B', 'C', 'C#', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'Gb', 'G']}></DropdownMenu>
 
                 </td>
                 <td className="InfoField">

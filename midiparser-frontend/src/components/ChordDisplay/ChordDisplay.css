@@ -7,6 +7,18 @@
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
+.ProgressionText {
+    text-align: left;
+    vertical-align: bottom;
+    padding-top: 15vh;
+    padding-bottom: 0;
+    padding-right:0;
+    font-size: 52px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    width: 60vw;
+    height: 10vh;
+}
+
 .ChordHeader {
     text-align: center;
     vertical-align: top;
@@ -20,6 +32,7 @@
     height: 69vh;
     background-color:rgb(231, 234, 245);
     display: inline-block;
+    vertical-align: top;
 }
 
 .LiveTopContainer {
@@ -33,4 +46,5 @@
     height: 69vh;
     background-color:rgb(183, 186, 197);
     display: inline-block;
+    vertical-align: top;
 }
