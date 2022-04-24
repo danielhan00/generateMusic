@@ -3,8 +3,7 @@ const { Pcset, Tonal } = require('@tonaljs/tonal')
 const MidiConvert = require('midiconvert')
 const { Progression } = require('@tonaljs/tonal')
 //const { Midi, Key, Scale } = require('@tonaljs/tonal')
-const {Midi, Key, Scale} = require('@tonaljs/tonal')
-
+const { Midi, Key, Scale } = require('@tonaljs/tonal')
 
 //sample data for testing
 var key = 'C'
