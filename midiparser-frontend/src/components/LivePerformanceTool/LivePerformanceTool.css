@@ -3,3 +3,8 @@
     height:max-content;
     background-color: darkblue;
 }
+
+.TempText {
+    font-size: 64px;
+    color: aliceblue;
+}
