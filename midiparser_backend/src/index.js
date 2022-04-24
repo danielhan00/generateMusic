@@ -3,7 +3,6 @@ const { Pcset, Tonal } = require('@tonaljs/tonal')
 const MidiConvert = require('midiconvert')
 const { Progression } = require('@tonaljs/tonal')
 const { Midi, Key, Scale } = require('@tonaljs/tonal')
-const Papa = require('papaparse')
 
 //sample data for testing
 var key = 'C'
@@ -11,7 +10,6 @@ var mode = 'Major'
 var genre = 'Rock'
 
 let fs = require('fs')
-const { timeStamp } = require('console')
 function readMidi(fileName) {
   fs.readFile(fileName, 'binary', function (err, midiBlob) {
     if (!err) {
@@ -110,26 +108,6 @@ function getFirstChannel(tracks) {
     }
   }
 }
-
-const file = fs.createReadStream('midiparser-backend/Chords.csv')
-var csvData = []
-Papa.parse(file, {
-  header: true,
-  step: function (result) {
-    csvData.push(result.data)
-  },
-  complete: function (results, file) {
-    console.log('Complete', csvData.length, 'records.')
-    for (var i = 0; i < csvData.length; i++) {
-      chords = csvData[i].chords.split(',')
-      tonality = csvData[i].tonality
-      if (tonality != '') {
-        //console.log(tonality, chords)
-        console.log(tonality, Progression.toRomanNumerals(tonality, chords))
-      }
-    }
-  },
-})
 
 function beatHelper(meausureDuration, noteDuration) {
   let beatArray = [1, 2, 3, 4, 8, 16, 32, 64]
