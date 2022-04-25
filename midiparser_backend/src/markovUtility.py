@@ -17,17 +17,25 @@ def chordNameHelper(r, key, mode):
             splitArray = r.split(substring, 1)
             prefix = splitArray[0]
             suffix = splitArray[1]
-            return replaceChordNameHelper(scVague.romanNumeral(prefix + substring).root().name) + suffix
+            chordName = scVague.romanNumeral(prefix + substring).root().name
+            chordName = chordName.replace('Fb', 'E').replace('Cb', 'B').replace(
+                'Fb', 'E').replace('E#', 'F').replace('B#', 'C')
+            if (chordName.count('-') > 1 or chordName.count('#') > 1):
+                return pitch.Pitch(chordName).getEnharmonic().name.replace('-', "b") + suffix
+            else:
+                return chordName.replace('-', "b") + suffix
 
-def replaceChordNameHelper(chord: str):
-    nameList = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
-    if '##' in chord:
-        nameIndex = nameList.index(chord[0])
-        chord = chord.replace(nameList[nameIndex] + '##', nameList[(nameIndex + 1) % len(nameList)])
-    elif '--' in chord:
-        nameIndex = nameList.index(chord[0])
-        chord = chord.replace(nameList[nameIndex] + '--', nameList[(nameIndex - 1) % len(nameList)])
-    return chord.replace('-', "b").replace('Fb', 'E').replace('Cb', 'B').replace('Fb', 'E').replace('E#', 'F').replace('B#', 'C')
+            # return replaceChordNameHelper(scVague.romanNumeral(prefix + substring).root().name) + suffix
+
+# def replaceChordNameHelper(chord: str):
+#     nameList = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+#     if '##' in chord:
+#         nameIndex = nameList.index(chord[0])
+#         chord = chord.replace(nameList[nameIndex] + '##', nameList[(nameIndex + 1) % len(nameList)])
+#     elif '--' in chord:
+#         nameIndex = nameList.index(chord[0])
+#         chord = chord.replace(nameList[nameIndex] + '--', nameList[(nameIndex - 1) % len(nameList)])
+#     return chord.replace('-', "b").replace('Fb', 'E').replace('Cb', 'B').replace('Fb', 'E').replace('E#', 'F').replace('B#', 'C')
 
 def findSingleChord(roman, key):
     key.replace('b', "-")
