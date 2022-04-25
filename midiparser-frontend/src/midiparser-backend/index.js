@@ -167,12 +167,29 @@ function getNoteData(duration, bars) {
       let timeString = '' + i + ':' + quarter + ':' + remainder
       noteData.push([
         timeString,
-        bars[i][j].midi,
+        Midi.midiToNoteName(bars[i][j].midi),
         beatHelper(duration, bars[i][j].duration),
       ])
     }
   }
   return noteData
+}
+
+function orderData(noteArray, measureNum) {
+  let measures = [];
+
+  for (let j = 0; j < measureNum; j++){
+    let measure = []
+    for (let k = 0; k < noteArray.length; k++){
+      let note = noteArray[k];
+      let m = parseInt(note[0].split(":")[0])
+      if (m === j) {
+        measure.push(noteArray[k]);
+      }
+    }
+    measures.push(measure);
+  }
+  return measures;
 }
 
 function findClosest(target, array) {
@@ -221,5 +238,6 @@ console.log(Progression.toRomanNumerals('D', ['D']))
 export {
   parseBars,
   getFirstChannel,
-  getNoteData
+  getNoteData,
+  orderData,
 }

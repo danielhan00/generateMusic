@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { parseBars, getFirstChannel, getNoteData} from "../../midiparser-backend";
+import { parseBars, getFirstChannel, getNoteData, orderData} from "../../midiparser-backend";
 import './MidiInput.css';
 import PianoRoll from "react-piano-roll";
 import { FilePicker } from "../reusable/FilePicker/FilePicker";
@@ -16,10 +16,11 @@ let midiFile = {
   bpm: 120,
   measures: 0,
   timeSig: [4, 4],
-  notes: []
+  notes: [],
+  parsedBars: [],
 }
 
-let player;
+
 
 export const MidiInput = (props) => {
   const [bpm, setBPM] = useState(null)
@@ -61,18 +62,26 @@ export const MidiInput = (props) => {
       whiteGridBgColor={0x282828}
       ref={playbackRef}
       time={props.time}
-      noteFormat={"MIDI"}
+      noteFormat={"String"}
       noteData={midiFile.notes}
     />
     setPianoRoll(pianoRoll);
-
+    console.log(midiFile);
   }, [content])
 
 
   function updateMidi(midi) {
     setBPM(midi.bpm);
+    console.log("midi.bpm:" + midi.bpm);
+    props.setTempo(midi.bpm);
     setMeasures(midi.measures);
+    props.setChordNum(midi.measures);
     setTimeSig(midi.timeSig);
+    props.setTimeSigNum(midi.timeSig[0]);
+    props.setTimeSigDenom(midi.timeSig[1]);
+
+    props.setMelody(midi.parsedBars);
+
     setNotes(midi.notes);
     //setFile(file);
 
@@ -114,7 +123,7 @@ export const MidiInput = (props) => {
       }
   });
     
-}, [playbackRef.current, currentTime])
+}, [playbackRef.current])
   
 
 
@@ -189,11 +198,11 @@ function uploadMidi(content) {
   console.log(parseBars(notes, measureDuration));
   //setMeasures(Object.keys(parseBars(notes, meausureDuration)).length);
   //console.log(readMidi(content));
-  midiFile[bpm] = bpm;
+  midiFile.bpm = bpm;
   midiFile.timeSig = timeSig;
   midiFile.measures = Object.keys(parsedBars).length;
   //console.log("num measures" + parseBars(notes, measureDuration))
-
+  midiFile.parsedBars = orderData(midiFile.notes, midiFile.measures);
   
   
   console.log(midiFile[bpm]);
@@ -201,6 +210,7 @@ function uploadMidi(content) {
     bpm: bpm,
     timeSig: timeSig,
     measures: Object.keys(parseBars(notes, measureDuration)).length,
+    parsedBars: parseBars(notes, measureDuration)
   }
   
 }

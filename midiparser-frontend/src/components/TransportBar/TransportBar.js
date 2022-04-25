@@ -10,7 +10,7 @@ export const TransportBar = (props) => {
             <tr>
                 <td className="TransportField">
                     <text>Genre</text>
-                    <DropdownMenu buttonName={props.genre} onClick={props.genreChangeClick} buttonOptions={['Pop','Rock', 'Jazz', 'Ragtime']}></DropdownMenu>
+                    <DropdownMenu buttonName={props.genre} onClick={props.genreChangeClick} buttonOptions={props.genreOptions.split(',')}></DropdownMenu>
                 </td>
                 <td className="TransportField">
                     <text>Tempo</text>
