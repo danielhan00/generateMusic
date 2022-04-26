@@ -5,9 +5,10 @@ import './SuggestionBar.css'
 
 export const SuggestionBar = (props) => {
     const [suggestions, setSuggestions] = useState([]);
-    const [choice, setChoice] = useState(["C", "D", "E", "F", "G", "A", "B", "C", "D"])
+    // const [choice, setChoice] = useState(["C", "D", "E", "F", "G", "A", "B", "C", "D"])
     const [update, setUpdate] = useState(false);
     
+    /*
     const updateChoices = (event,index) => {
         const newChoices = choice;
         console.log(event)
@@ -18,7 +19,7 @@ export const SuggestionBar = (props) => {
         console.log(choice)
         setUpdate(true);
     }
-
+*/
     let measureWidth = 1474/ props.measures;
     const pianoWidth = 126;
     
@@ -33,7 +34,7 @@ export const SuggestionBar = (props) => {
             suggestions.push(
                 <div className="Suggestion"  key={measure} style={{width:measureWidth}} >
                     <text>Chord</text>
-                    <DropdownMenu  buttonName={choice[measure]} onClick={(e) => updateChoices(e, measure)} buttonOptions={["C", "Dm", "Em", "F", "G", "Am" , "Bdim"]}></DropdownMenu>
+                    <DropdownMenu  buttonName={props.chords[measure]} /*onClick={(e) => updateChoices(e, measure)}*/ buttonOptions={["C", "Dm", "Em", "F", "G", "Am" , "Bdim"]}></DropdownMenu>
                 </div>)
         }
         //document.getElementsByClassName("Suggestion").

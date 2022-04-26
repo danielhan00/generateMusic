@@ -3,7 +3,7 @@ import { parseBars, getFirstChannel, getNoteData, orderData} from "../../midipar
 import './MidiInput.css';
 import PianoRoll from "react-piano-roll";
 import { FilePicker } from "../reusable/FilePicker/FilePicker";
-import { SuggestionBar } from "../SuggestionBar/SuggestionBar";
+
 import { LocalStoragePicker } from "../reusable/LocalStoragePicker/LocalStoragePicker";
 //import * as MIDI from 'midicube';
 const MidiConvert = require('midiconvert')
@@ -41,7 +41,7 @@ export const MidiInput = (props) => {
     setPianoRoll();
     setContent(content);
     uploadMidi(content);
-    
+    props.setUpdateChords(props.updateChords + 1);
   }
 
   useEffect(() => {
@@ -137,7 +137,7 @@ export const MidiInput = (props) => {
         </tr>
       </table>
     {pianoRoll}
-    <SuggestionBar  measures={measures}/>
+    
 
       
     </div>

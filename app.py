@@ -86,10 +86,9 @@ def train_markov_chains():
             prev2Chord = '' + prevChord
         genre_map[genre_tonality] = currMarkov
 
-    for key in genre_names:
-        # markov chains are not written because of inefficiency
-        #genre_map[key + '_Major'].write_markov_chain_to_file()
-        #genre_map[key + '_Minor'].write_markov_chain_to_file()
+    for key in genre_map:
+        genre_map[key].refresh_mc()
+        #genre_map[key].write_markov_chain_to_file()
         print(key)
 train_markov_chains()
 #print(findAllChords('A', genre_map.get('Rock_Minor').run(5)))
@@ -127,12 +126,57 @@ class livePerformanceApi(Resource):
     parser.add_argument('key', type=str)
     parser.add_argument('tonality', type=str)
     parser.add_argument('numChords', type=int)
+    args = parser.parse_args()
+    
+    # BAD CODE, HERE UNTIL MARKOV CHAIN GETS REFACTORED
+    melodyNotes = []
+    x = 0
+    while (x < args.numChords):
+        melodyNotes.append(['a'])
+        x += 1
+
+    # try to create chords using the data from js request
+    #try:
+    chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords, melodyNotes))
+    return {
+        'resultStatus': 'SUCCESS',
+        'chords': chords,
+      }
+#    # except:
+#         return {
+#             'resultStatus': 'FAILURE',
+#             'chords': ['Request', 'Failed']
+#         }
+
+#SONG WRITING API
+class songWritingApi(Resource):
+  def get(self):
+    print('in api get')
+    genreOptions = list(genre_names)
+    genresString =''
+    for i in range(len(genreOptions)):
+        genresString += genreOptions[i]
+        if (i < len(genreOptions) - 1):
+            genresString += ','
+    print(genresString)
+    return {
+      'resultStatus': 'SUCCESS',
+      'genreOptions': genresString
+      }
+
+  def post(self):
+    # parse post request from js
+    parser = reqparse.RequestParser()
+    parser.add_argument('genre', type=str)
+    parser.add_argument('key', type=str)
+    parser.add_argument('tonality', type=str)
+    parser.add_argument('numChords', type=int)
     parser.add_argument('melodyNotes', type=list)
     args = parser.parse_args()
 
     # try to create chords using the data from js request
     try:
-        chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords))
+        chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords, args.melodyNotes))
         return {
             'resultStatus': 'SUCCESS',
             'chords': chords,
@@ -143,4 +187,4 @@ class livePerformanceApi(Resource):
             'chords': ['Request', 'Failed']
         }
 
-api.add_resource(livePerformanceApi, '/flask/getchords')
+api.add_resource(songWritingApi, '/flask/getchordssw')

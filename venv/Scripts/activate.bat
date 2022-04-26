@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\KEVIN GAO\NU\9, 2022 Spring\MUST4611 - CAPSTONE\Project B - Music Markov Chain\Group Project\midiParser\venv
+set VIRTUAL_ENV=C:\Users\agj71\Documents\Spring 2022\MUST 4611\midiParser\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

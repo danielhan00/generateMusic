@@ -24,6 +24,10 @@ class secondOrderMarkovChain():
     # They are not required to always be equivalent to the Markov Chain
     _markov_chain_table: Dict[status, Dict[status, Dict[status, float]]]
     """The Markov Chain as the result"""
+    _running_prev_stat: status
+    """The previous status tracked in the running method"""
+    _running_prev_prev_stat: status
+    """The previous-previous status tracked in the running method"""
 
     # --------------------------------- Constructor ------------------------------------
     def __init__(self, genre_name: str, for_chords: bool) -> None:
@@ -264,79 +268,260 @@ class secondOrderMarkovChain():
     # -----------------------------------------------------
     # -------------------- THE RUNNER ---------------------
     # -----------------------------------------------------
+    # ******************************************************************************
     # TO RUN THE SECOND-ORDER MARKOV CHAIN
-    def run(self, run_num: int, melody_notes: list=[]) -> List[str]:
-        self.refresh_mc() # ADDED TO MAKE SURE
+    # THIS IS THE MAJOR FUNCTION THAT OUTPUT THE CHORD PROGRESSION TO THE FRONT-END
+    # ******************************************************************************
+    def run(self, num_chord: int, melody_notes: List[List[str]]) -> List[str]:
+        # The system generates chords randomly one by one
+        # The system recursively generate it until it is acceptable
+        # We are doing so because this is the dot product of:
+        #    -- Each chord is generated individually based on the result of machine learning
+        #    -- The output is acceptable according to the music theory
+
+        #   -----------------------------------------------------------------
+        #   | 1 chord: generate                                             |
+        #   | 2 chord: generate -> resolve                                  |
+        #   | 3+ chord: generate -> random * (n|n>=0) -> resolve -> resolve |
+        #   -----------------------------------------------------------------
+
+        # Prevent the Markov Chain from being empty
+        if len(self._markov_chain_table.keys()) == 0:
+            raise ValueError('Well, for some reason, the Markov Chain is empty')
+
+        # Prevent the number of chords being zero or negative
+        if num_chord <= 0:
+            raise ValueError('Uh uh, the number of chords cannot be 0 or negative')
+
+        # Initialize the string list shooting to the front-end
         result = []
 
-        # Randomly select a starting status
-        all_starting_stat = []
-        for one_stat in self._markov_chain_table.keys():
-            all_starting_stat.append(one_stat)
-        random_index = random.randint(0, (len(all_starting_stat) - 1))
-        # check if fits in melody, otherwise generate a different chord
-        starting_status = status('i') #all_starting_stat[random_index]
+        # generate first chord
+        first_chord = self.generate_one_chord_and_evaluate(1, melody_notes[0])
+        self._running_prev_stat = first_chord
+        result.append(first_chord.get_status_name())
 
-        static_markov = self.get_markov_chain()
-        current_stat = starting_status
-        previous_stat = starting_status
+        if num_chord >= 2:
+            # One-step resolve
+            if num_chord == 2:
+                second_and_last_chord = self.generate_one_chord_and_evaluate(4, melody_notes[1])
+                self._running_prev_prev_stat = self._running_prev_stat
+                self._running_prev_stat = second_and_last_chord
+                result.append(second_and_last_chord.get_status_name())
 
-        result.append(current_stat)
-        print(current_stat.get_status_name(), end=" ")
-        chord_fits_melody = False
+            # (Random * (n|n>=0)) + two-step resolve
+            else:
+                # (Random * (n|n>=0))
+                current_chord = 2
+                while current_chord <= num_chord - 2:
+                    # The first random is determined by the average possibility of the 2nd-order markov chain
+                    if current_chord == 2:
+                        second_chord = self.generate_one_chord_and_evaluate(2, melody_notes[1])
+                        self._running_prev_prev_stat = self._running_prev_stat
+                        self._running_prev_stat = second_chord
+                        result.append(second_chord.get_status_name())
 
+                    # The rest is exactly the possibility in the 2nd-order markov chain
+                    else:
+                        new_chord = self.generate_one_chord_and_evaluate(3, melody_notes[current_chord - 1])
+                        self._running_prev_prev_stat = self._running_prev_stat
+                        self._running_prev_stat = new_chord
+                        result.append(new_chord.get_status_name())
+
+                    current_chord = current_chord + 1
+
+                # two-step resolve
+                second_last_chord = self.generate_one_chord_and_evaluate(4, melody_notes[num_chord - 2])
+                self._running_prev_prev_stat = self._running_prev_stat
+                self._running_prev_stat = second_last_chord
+                result.append(second_last_chord.get_status_name())
+
+                last_chord = self.generate_one_chord_and_evaluate(4, melody_notes[num_chord - 1])
+                self._running_prev_prev_stat = self._running_prev_stat
+                self._running_prev_stat = last_chord
+                result.append(last_chord.get_status_name())
+
+        for onestr in result:
+            print(onestr)
+
+        return result
+
+    # TO GENERATE ONE CHORD RECURSIVELY UNTIL IT IS ACCEPTED
+    def generate_one_chord_and_evaluate(self, generate_type_flag: int, measure_notes: List[str]) -> status:
+        chord_accepted = False
         attempt = 0
-        while attempt < run_num - 1:
-            current_stat_possibility_chart: Dict[status, float]
-            # add while loop here to check if generated chord fits with melody notes
-            chord_fits_melody = False
-            while not chord_fits_melody:
-                if attempt == 0:
-                    # We come up with the average possibility to transfer to other states
-                    current_stat_possibility_chart = {}
-
-                    for next_stat_to_spit in static_markov.keys():
-                        average_possibility = 0.0
-                        factor = 0.0
-
-                        for prev_prev_stat in static_markov.keys():
-                            this_prev_prev_possibility = static_markov.get(prev_prev_stat).get(current_stat)\
-                                .get(next_stat_to_spit)
-                            average_possibility = average_possibility + this_prev_prev_possibility
-                            factor = factor + 1.0
-
-                        average_possibility = average_possibility / factor
-                        current_stat_possibility_chart[next_stat_to_spit] = average_possibility
-
-                else:
-                    current_stat_possibility_chart = static_markov.get(previous_stat).get(current_stat)
-
-                all_next_stat = list(current_stat_possibility_chart.keys())
-                all_next_stat_possibility = list(current_stat_possibility_chart.values())
-
-                # Get the next status using the current Markov Model
-                rand = random.random()
-                get_stat_attempt = 0
-                while rand > 0:
-                    rand = rand - all_next_stat_possibility[get_stat_attempt]
-                    get_stat_attempt = get_stat_attempt + 1
-
-                previous_stat = current_stat
-                current_stat = all_next_stat[get_stat_attempt - 1]
-                chord_fits_melody = True
-                #check if melody notes exist
-                #chord_fits_melody = #helper method to check if fits(melody_notes[attempt], current_stat)
-            #while loop ends
-            print(current_stat.get_status_name(), end=" ")
-            result.append(current_stat)
-
+        while (not chord_accepted) and (attempt < 30):
             attempt = attempt + 1
+            new_chord: status
+            # 1: itself
+            # 2: based on prev
+            # 3: based on prev and prev_prev
+            # 4: resolve based on prev
+            if generate_type_flag == 1:
+                new_chord = self.generated_one_chord_itself()
+            elif generate_type_flag == 2:
+                new_chord = self.generated_one_chord_base_on_prev(self._running_prev_stat)
+            elif generate_type_flag == 3:
+                new_chord \
+                    = self.generated_one_chord_base_on_pnpp(self._running_prev_stat, self._running_prev_prev_stat)
+            elif generate_type_flag == 4:
+                new_chord = self.resolve_one_chord_base_on_prev(self._running_prev_stat)
+            else:
+                raise ValueError('Up till now generate types only have 1, 2, 3, and 4')
 
-        #print (current_stat.get_status_name())
-        str_result = []
-        for stat in result:
-            str_result.append(stat.get_status_name())
-        return str_result
+            new_chord_name = new_chord.get_status_name()
+            if self.acceptable(new_chord_name, measure_notes):
+                chord_accepted = True
+
+        return new_chord
+
+    # TO GENERATE ONE CHORD (NAME) REGARDLESS OF ANY PREV STATUS
+    def generated_one_chord_itself(self) -> status:
+        static_markov = self.get_markov_chain()
+
+        # We come up with the average possibility to transfer to other states
+        possibility_chart = {}
+
+        for next_stat_to_spit in static_markov.keys():
+            average_possibility = 0.0
+            factor = 0.0
+
+            for prev_prev_stat in static_markov.keys():
+                for prev_stat in static_markov.get(prev_prev_stat).keys():
+                    this_prev_possibility \
+                        = static_markov.get(prev_prev_stat).get(prev_stat)[next_stat_to_spit]
+                    average_possibility = average_possibility + this_prev_possibility
+                    factor = factor + 1.0
+
+            average_possibility = average_possibility / factor
+            possibility_chart[next_stat_to_spit] = average_possibility
+
+        all_next_stat = list(possibility_chart.keys())
+        all_next_stat_possibility = list(possibility_chart.values())
+
+        # Randomly select one status
+        rand = random.random()
+        get_stat_attempt = 0
+        while rand > 0:
+            rand = rand - all_next_stat_possibility[get_stat_attempt]
+            get_stat_attempt = get_stat_attempt + 1
+        result = all_next_stat[get_stat_attempt - 1]
+
+        return result
+
+    # TO GENERATE ONE CHORD (NAME) BASED ON THE PREVIOUS STATUS
+    def generated_one_chord_base_on_prev(self, prev_stat: status) -> status:
+        static_markov = self.get_markov_chain()
+
+        # We come up with the average possibility to transfer to other states
+        possibility_chart = {}
+
+        for next_stat_to_spit in static_markov.keys():
+            average_possibility = 0.0
+            factor = 0.0
+
+            for prev_prev_stat in static_markov.keys():
+                this_prev_prev_possibility \
+                    = static_markov.get(prev_prev_stat).get(self._running_prev_stat)[next_stat_to_spit]
+                average_possibility = average_possibility + this_prev_prev_possibility
+                factor = factor + 1.0
+
+            average_possibility = average_possibility / factor
+            possibility_chart[next_stat_to_spit] = average_possibility
+
+        all_next_stat = list(possibility_chart.keys())
+        all_next_stat_possibility = list(possibility_chart.values())
+
+        # Randomly select one status
+        rand = random.random()
+        get_stat_attempt = 0
+        while rand > 0:
+            rand = rand - all_next_stat_possibility[get_stat_attempt]
+            get_stat_attempt = get_stat_attempt + 1
+        result = all_next_stat[get_stat_attempt - 1]
+
+        return result
+
+    # TO GENERATE ONE CHORD (NAME) BASED ON THE PREVIOUS STATUS AND THE PREVIOUS-PREVIOUS STATUS
+    def generated_one_chord_base_on_pnpp(self, prev_stat: status, prev_prev_stat: status) -> status:
+        # Get the 1D possibility chart directly
+        possibility_chart = self._markov_chain_table.get(self._running_prev_prev_stat).get(self._running_prev_stat)
+        all_next_stat = list(possibility_chart.keys())
+        all_next_stat_possibility = list(possibility_chart.values())
+
+        # Randomly select one status
+        rand = random.random()
+        get_stat_attempt = 0
+        while rand > 0:
+            rand = rand - all_next_stat_possibility[get_stat_attempt]
+            get_stat_attempt = get_stat_attempt + 1
+        result = all_next_stat[get_stat_attempt - 1]
+
+        return result
+
+    # TRY TO RESOLVE A CHORD BASED ON THE PREVIOUS CHORD
+    def resolve_one_chord_base_on_prev(self, prev_stat: status) -> status:
+        rand = (random.random()) * 4.0
+        if prev_stat.get_status_name().__contains__('i') or prev_stat.get_status_name().__contains__('I'):
+            if rand < 1.0:
+                return status('i')
+            elif 1.0 <= rand < 3.0:
+                return status('v')
+            else:
+                return status('iv')
+        elif prev_stat.get_status_name().__contains__('ii') or prev_stat.get_status_name().__contains__('II'):
+            if rand < 1.0:
+                return status('i')
+            elif 1.0 <= rand < 3.0:
+                return status('v')
+            else:
+                return status('iv')
+        elif prev_stat.get_status_name().__contains__('iii') or prev_stat.get_status_name().__contains__('III'):
+            if rand < 0.25:
+                return status('i')
+            elif 0.25 <= rand < 3.25:
+                return status('v')
+            else:
+                return status('iv')
+        elif prev_stat.get_status_name().__contains__('iv') or prev_stat.get_status_name().__contains__('IV'):
+            if rand < 1.0:
+                return status('i')
+            elif 1.0 <= rand < 3.0:
+                return status('v')
+            else:
+                return status('iv')
+        elif prev_stat.get_status_name().__contains__('v') or prev_stat.get_status_name().__contains__('V'):
+            if rand < 0.5:
+                return status('v')
+            elif 0.5 <= rand < 3.5:
+                return status('i')
+            else:
+                return status('iv')
+        elif prev_stat.get_status_name().__contains__('vi') or prev_stat.get_status_name().__contains__('VI'):
+            if rand < 1.0:
+                return status('i')
+            elif 1.0 <= rand < 3.0:
+                return status('v')
+            else:
+                return status('iv')
+        elif prev_stat.get_status_name().__contains__('vii') or prev_stat.get_status_name().__contains__('VII'):
+            if rand < 1.75:
+                return status('i')
+            elif 1.75 <= rand < 3.75:
+                return status('v')
+            else:
+                return status('iv')
+        else:
+            if rand < 1.5:
+                return status('i')
+            elif 1.5 <= rand < 3.0:
+                return status('v')
+            else:
+                return status('iv')
+
+    # TO DETERMINE IF ONE CHORD IS ACCEPTABLE WITH THE GIVEN MELODY
+    def acceptable(self, chord_name: str, measure_notes) -> bool:
+        return True
 
     # -----------------------------------------------------
     # ---------------- READERS & WRITERS ------------------
