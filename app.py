@@ -88,9 +88,9 @@ def train_markov_chains():
 
     for key in genre_map:
         genre_map[key].refresh_mc()
-        #genre_map[key + '_Minor'].write_markov_chain_to_file()
+        #genre_map[key].write_markov_chain_to_file()
         print(key)
-#train_markov_chains()
+train_markov_chains()
 #print(findAllChords('A', genre_map.get('Rock_Minor').run(5)))
 
 # NOT USED: reading markov chain takes too long
