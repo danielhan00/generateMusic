@@ -2,8 +2,8 @@
 # Such that different status have chances (sum to 1) to transfer to the next status
 
 from typing import Any, Dict, List
-#from midiparser_backend.src.status import Any, status
-from Markov_Chain.status import Any, status
+from midiparser_backend.src.status import Any, status
+#from Markov_Chain.status import Any, status
 import random
 
 
@@ -464,60 +464,60 @@ class secondOrderMarkovChain():
         rand = (random.random()) * 4.0
         if prev_stat.get_status_name().__contains__('i') or prev_stat.get_status_name().__contains__('I'):
             if rand < 1.0:
-                return status('I')
+                return status('i')
             elif 1.0 <= rand < 3.0:
-                return status('V')
+                return status('v')
             else:
-                return status('IV')
+                return status('iv')
         elif prev_stat.get_status_name().__contains__('ii') or prev_stat.get_status_name().__contains__('II'):
             if rand < 1.0:
-                return status('I')
+                return status('i')
             elif 1.0 <= rand < 3.0:
-                return status('V')
+                return status('v')
             else:
-                return status('IV')
+                return status('iv')
         elif prev_stat.get_status_name().__contains__('iii') or prev_stat.get_status_name().__contains__('III'):
             if rand < 0.25:
-                return status('I')
+                return status('i')
             elif 0.25 <= rand < 3.25:
-                return status('V')
+                return status('v')
             else:
-                return status('IV')
+                return status('iv')
         elif prev_stat.get_status_name().__contains__('iv') or prev_stat.get_status_name().__contains__('IV'):
             if rand < 1.0:
-                return status('I')
+                return status('i')
             elif 1.0 <= rand < 3.0:
-                return status('V')
+                return status('v')
             else:
-                return status('IV')
+                return status('iv')
         elif prev_stat.get_status_name().__contains__('v') or prev_stat.get_status_name().__contains__('V'):
             if rand < 0.5:
-                return status('V')
+                return status('v')
             elif 0.5 <= rand < 3.5:
-                return status('I')
+                return status('i')
             else:
-                return status('IV')
+                return status('iv')
         elif prev_stat.get_status_name().__contains__('vi') or prev_stat.get_status_name().__contains__('VI'):
             if rand < 1.0:
-                return status('I')
+                return status('i')
             elif 1.0 <= rand < 3.0:
-                return status('V')
+                return status('v')
             else:
-                return status('IV')
+                return status('iv')
         elif prev_stat.get_status_name().__contains__('vii') or prev_stat.get_status_name().__contains__('VII'):
             if rand < 1.75:
-                return status('I')
+                return status('i')
             elif 1.75 <= rand < 3.75:
-                return status('V')
+                return status('v')
             else:
-                return status('IV')
+                return status('iv')
         else:
             if rand < 1.5:
-                return status('I')
+                return status('i')
             elif 1.5 <= rand < 3.0:
-                return status('V')
+                return status('v')
             else:
-                return status('IV')
+                return status('iv')
 
     # TO DETERMINE IF ONE CHORD IS ACCEPTABLE WITH THE GIVEN MELODY
     def acceptable(self, chord_name: str, measure_notes) -> bool:

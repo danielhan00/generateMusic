@@ -86,12 +86,11 @@ def train_markov_chains():
             prev2Chord = '' + prevChord
         genre_map[genre_tonality] = currMarkov
 
-    for key in genre_names:
-        # markov chains are not written because of inefficiency
-        #genre_map[key + '_Major'].write_markov_chain_to_file()
+    for key in genre_map:
+        genre_map[key].refresh_mc()
         #genre_map[key + '_Minor'].write_markov_chain_to_file()
         print(key)
-train_markov_chains()
+#train_markov_chains()
 #print(findAllChords('A', genre_map.get('Rock_Minor').run(5)))
 
 # NOT USED: reading markov chain takes too long
@@ -129,18 +128,25 @@ class livePerformanceApi(Resource):
     parser.add_argument('numChords', type=int)
     parser.add_argument('melodyNotes', type=list)
     args = parser.parse_args()
+    
+    # BAD CODE, HERE UNTIL MARKOV CHAIN GETS REFACTORED
+    melodyNotes = []
+    x = 0
+    while (x < args.numChords):
+        melodyNotes.append(['a'])
+        x += 1
 
     # try to create chords using the data from js request
-    try:
-        chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords))
-        return {
-            'resultStatus': 'SUCCESS',
-            'chords': chords,
-        }
-    except:
-        return {
-            'resultStatus': 'FAILURE',
-            'chords': ['Request', 'Failed']
-        }
+    #try:
+    chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords, melodyNotes))
+    return {
+        'resultStatus': 'SUCCESS',
+        'chords': chords,
+      }
+#    # except:
+#         return {
+#             'resultStatus': 'FAILURE',
+#             'chords': ['Request', 'Failed']
+#         }
 
 api.add_resource(livePerformanceApi, '/flask/getchords')
