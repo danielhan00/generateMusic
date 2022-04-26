@@ -17,12 +17,14 @@ def chordNameHelper(r, key, mode):
             splitArray = r.split(substring, 1)
             prefix = splitArray[0]
             suffix = splitArray[1]
-            chordName = scVague.romanNumeral(prefix + substring).root().name  
-            chordName = chordName.replace('Fb', 'E').replace('Cb', 'B').replace('Fb', 'E').replace('E#', 'F').replace('B#', 'C')
-            if (chordName.count('-') > 1 or chordName.count('#')>1):
+            chordName = scVague.romanNumeral(prefix + substring).root().name
+            chordName = chordName.replace('Fb', 'E').replace('Cb', 'B').replace(
+                'Fb', 'E').replace('E#', 'F').replace('B#', 'C')
+            if (chordName.count('-') > 1 or chordName.count('#') > 1):
                 return pitch.Pitch(chordName).getEnharmonic().name.replace('-', "b") + suffix
             else:
                 return chordName.replace('-', "b") + suffix
+
 
 def findSingleChord(roman, key):
     key.replace('b', "-")
@@ -43,13 +45,14 @@ def findAllChords(key, list):
     print(allChords)
     return allChords
 
+
 def getSuffix(chord):
     suffix = ''
     perentheses = ''
     if chord.find('(') != -1:
         peren = chord[chord.find("("):chord.find(")")+1]
         chord = chord.replace(peren, '')
-        perentheses= re.sub("[()]", "", peren)
+        perentheses = re.sub("[()]", "", peren)
 
     if chord.find('mmaj') != -1:
         suffix = chord[chord.find('mmaj'):]
@@ -83,29 +86,49 @@ def getSuffix(chord):
     return chord, suffix+perentheses
 
 
-findAllChords("Bb", romanSplit)
+# findAllChords("Bb", romanSplit)
 
-def validateChords(key,mode,chord,melodyNotes) :
+
+def validateChords(key, mode, chord, melodyNotes):
+    notesInChord = ["C", "E", "G"]
+    chordLength = len(notesInChord)
+    count = 0
     scVague = scale.ConcreteScale()
     scVague.abstract = scale.AbstractDiatonicScale(mode)
     scVague.tonic = pitch.Pitch(key)
     keyPitches = [p.name for p in scVague.getPitches()]
-    print(keyPitches)
     chord, suffix = getSuffix(chord)
-    if (chord.count('-') > 1 or chord.count('#')>1):
-        chord = pitch.Pitch(chord).getEnharmonic().name
-        print(chord)
-    print(chord in keyPitches)
-    
 
-print(getSuffix('Cmaj7'))
-print(getSuffix('Cmmaj9'))
-print(getSuffix('C9'))
-print(getSuffix('C9add9'))
-print(getSuffix('C9sus2'))
-print(getSuffix('Cb9sus2'))
-print(findSingleChord("#i","B"))
-validateChords("Cb", "Major", "Dbbb9sus2", ['D#'])
+    if (chord.count('-') > 1 or chord.count('#') > 1):
+        chord = pitch.Pitch(chord).getEnharmonic().name
+
+    if(melodyNotes[0] not in notesInChord):
+        return False
+
+    for note in notesInChord:
+        if(note not in keyPitches):
+            return False
+    for note in notesInChord:
+        if (note in melodyNotes):
+            count += 1
+    if(count/chordLength >= .5):
+        print(count/chordLength)
+        return True
+    else:
+        return False
+
+# print("C" not in ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'C'])
+# print(getSuffix('Cmaj7'))
+# print(getSuffix('Cmmaj9'))
+# print(getSuffix('C9'))
+# print(getSuffix('C9add9'))
+# print(getSuffix('C9sus2'))
+# print(getSuffix('Cb9sus2'))
+# print(findSingleChord("#i","B"))
+print(validateChords("C", "Major", "C", ["C", "E", "D", "F"]))
+print(validateChords("C", "Major", "C", ["B", "E", "D", "F"]))
+print(validateChords("C", "Major", "C", ["C", "E", "G", "F"]))
+print(validateChords("C", "Major", "C", ["C#", "E", "G", "F"]))
 # file = open(
 #     '/midiparser/midiparser_backend/artistsAndGenres.csv')
 # csvreader = csv.reader(file)
