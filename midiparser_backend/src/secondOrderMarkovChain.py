@@ -1,6 +1,6 @@
 # To represent a second_order markov chain
 # Such that different status have chances (sum to 1) to transfer to the next status
-
+from .markovUtility import validateChords
 from typing import Any, Dict, List
 from midiparser_backend.src.status import Any, status
 #from Markov_Chain.status import Any, status
@@ -371,6 +371,7 @@ class secondOrderMarkovChain():
 
             new_chord_name = new_chord.get_status_name()
             if self.acceptable(new_chord_name, measure_notes):
+                #validateChords(key,tonality,new_chord_name, measure_notes)
                 chord_accepted = True
 
         return new_chord
