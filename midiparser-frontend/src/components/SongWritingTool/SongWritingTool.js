@@ -23,9 +23,12 @@ export const SongWritingTool =(props)=>{
     const [chordNum, setChordNum] = useState(0);
     const [chords, setChords] = useState([]);
     const [updateChords, setUpdateChords] = useState(0);
+    const [isLoading, setLoading] = useState(true);
 
 
+    
     useEffect(() => {
+        setLoading(true);
         axios.post('http://localhost:5000/flask/getchordssw',
             {
                 "genre": genre,
@@ -36,6 +39,7 @@ export const SongWritingTool =(props)=>{
             }).then(response => {
                 console.log("SUCCESS", response)
                 setChords(response.data.chords)
+                setLoading(false);
             }).catch(error => {
                 console.log(error)
             })
@@ -50,7 +54,7 @@ export const SongWritingTool =(props)=>{
                 console.log(error)
             })
 
-    }, [])
+    }, []) 
 
 
     function updateTransport() {
@@ -69,11 +73,10 @@ export const SongWritingTool =(props)=>{
             timeSigNum={beatsPerMeasure} setTimeSigNum={setBeatsPerMeasure} setTimeSigDenom={setTimeSigDenom} timeSigDenom={timeSigDenom}
             melody={melody} setMelody={setMelody} chordNum={chordNum} setChordNum={setChordNum} updateChords={updateChords} setUpdateChords={setUpdateChords}
         ></MidiInput>
-        <SuggestionBar measures={chordNum} chords={chords} setChords={setChords} />
-        <p>{chords}</p>
+        <SuggestionBar measures={chordNum} chords={chords} setChords={setChords} isLoading={isLoading} />
        <TransportBar genre={genre} genreOptions={genreMessage.data.genreOptions} genreChangeClick={setGenre} 
         keyLetter={keyLetter} keyLetterClick={setKeyLetter} keyQuality={keyQuality} keyQualityClick={setKeyQuality} tempo={tempo} setTempo={setTempo}
-        timeSigNum={beatsPerMeasure} setTimeSigNum={setBeatsPerMeasure} setTimeSigDenom={setTimeSigDenom} timeSigDenom={timeSigDenom}></TransportBar>
+        timeSigNum={beatsPerMeasure} setTimeSigNum={setBeatsPerMeasure} setTimeSigDenom={setTimeSigDenom} timeSigDenom={timeSigDenom} changeChords={setUpdateChords} currChordProg={updateChords}></TransportBar>
     </div>;
 }
 
