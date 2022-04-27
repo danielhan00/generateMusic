@@ -6,6 +6,6 @@ export const AButton = (props) => {
         props.onClick(props.clickVar + 1);
     }
 
-    return <Button disabled={props.playing} id="dropdown-basic-button" variant="secondary" onClick={handleClick}>{props.buttonName}</Button>
+    return <Button disabled={false} id="dropdown-basic-button" variant="secondary" onClick={handleClick}>{props.buttonName}</Button>
 }
 

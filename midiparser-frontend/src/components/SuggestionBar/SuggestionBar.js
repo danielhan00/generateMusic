@@ -1,7 +1,8 @@
-import { left } from "@popperjs/core";
 import React, { useEffect, useState } from "react";
-import { DropdownMenu } from '../reusable/DropdownMenu/DropdownMenu';
+import { Button } from 'react-bootstrap';
+import { LineScalePulseOut } from 'react-pure-loaders';
 import './SuggestionBar.css'
+
 
 export const SuggestionBar = (props) => {
     const [suggestions, setSuggestions] = useState([]);
@@ -20,7 +21,7 @@ export const SuggestionBar = (props) => {
         setUpdate(true);
     }
 */
-    let measureWidth = 1474/ props.measures;
+    let measureWidth = 1494/ props.measures;
     const pianoWidth = 126;
     
     
@@ -34,17 +35,17 @@ export const SuggestionBar = (props) => {
             suggestions.push(
                 <div className="Suggestion"  key={measure} style={{width:measureWidth}} >
                     <text>Chord</text>
-                    <DropdownMenu  buttonName={props.chords[measure]} /*onClick={(e) => updateChoices(e, measure)}*/ buttonOptions={["C", "Dm", "Em", "F", "G", "Am" , "Bdim"]}></DropdownMenu>
+                    <br></br>
+                    {props.isLoading? <LineScalePulseOut color={'#fff'} loading={props.isLoading}/> :<Button className='upload-btn' variant="secondary">{props.chords[measure]}</Button>}
                 </div>)
         }
-        //document.getElementsByClassName("Suggestion").
         console.log(suggestions);
         if(update){setUpdate(false)}
         setSuggestions(suggestions);
     }, [props,update])
     
-    return <><div className="SuggestionBar">
-                    {suggestions}
+    return <><div className="SuggestionBar">     
+        {suggestions}
     </div>
     </>
 }

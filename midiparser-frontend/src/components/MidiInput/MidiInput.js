@@ -38,20 +38,21 @@ export const MidiInput = (props) => {
   
 
   function updateContent(content) {
-    setPianoRoll();
-    setContent(content);
-    uploadMidi(content);
-    props.setUpdateChords(props.updateChords + 1);
+      setPianoRoll();
+      setContent(content);
+      uploadMidi(content);
+      
   }
 
   useEffect(() => {
     updateMidi(midiFile);
+
     //loadMidi(file);
-  }, [props, content]);
+  }, [content]);
 
   useEffect(() => {
     let pianoRoll = <PianoRoll
-      width={1600}
+      width={1620}
       height={500}
       zoom={midiFile.measures}
       resolution={1}
@@ -81,7 +82,8 @@ export const MidiInput = (props) => {
     props.setTimeSigDenom(midi.timeSig[1]);
 
     props.setMelody(midi.parsedBars);
-
+    props.setUpdateChords(props.updateChords + 1);
+    
     setNotes(midi.notes);
     //setFile(file);
 
