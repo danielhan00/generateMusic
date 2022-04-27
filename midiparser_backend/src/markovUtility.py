@@ -1,11 +1,7 @@
 import csv
 import re
 from music21 import *
-<<<<<<< HEAD
-
-=======
 from pychord import Chord
->>>>>>> 3dcdb825fc6d3408e22e97415b2b6c8406bae211
 romanTest = "vi,#ivm,ii,vi,vi,#ivm,ii,vi,ii,vi,ii,vi,#ivm,iii,vi,#im7,ii,ii6,iii,vi,vi,#ivm,ii,vi,ii,vi,ii,vi,#ivm,iii,vi,#im7,ii,ii6,iii,vi,#ivm,ii,vi,iii,#ivm,ii,vi,iii,#ivm,ii,vi,iii,#ivm,ii,vi,iii,ii,vi,ii,vi,#ivm,iii,#im7,iii,ii,ii6,iii,vi,ii,iii,#ivm7"
 romanSplit = romanTest.split(',')
 
@@ -60,10 +56,6 @@ def findAllChords(key, list):
     #print(allChords)
     return allChords
 
-<<<<<<< HEAD
-
-#findAllChords("Bb", romanSplit)
-=======
 def getSuffix(chord):
     suffix = ''
     perentheses = ''
@@ -160,7 +152,6 @@ def validateChords(key, mode, chord, melodyNotes):
 # print(validateChords("C", "Major", "C", ["C#", "E", "G", "F"]))
 
 # #findAllChords("Bb", romanSplit)
->>>>>>> 3dcdb825fc6d3408e22e97415b2b6c8406bae211
 
 
 # file = open(

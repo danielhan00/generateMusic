@@ -148,6 +148,8 @@ class livePerformanceApi(Resource):
 #             'chords': ['Request', 'Failed']
 #         }
 
+api.add_resource(livePerformanceApi, '/flask/getchords')
+
 #SONG WRITING API
 class songWritingApi(Resource):
   def get(self):
