@@ -5,7 +5,7 @@ from flask_cors import CORS  # comment this on deployment
 from api.TestApi import TestApi
 #from livePerformanceApi import livePerformanceApi
 from midiparser_backend.src.secondOrderMarkovChain import Any, secondOrderMarkovChain
-from midiparser_backend.src.markovUtility import findAllChords
+from midiparser_backend.src.markovUtility import findAllChords, getNotesFromChordName
 import csv
 
 app = Flask(__name__, static_url_path='', static_folder='frontend/build')
@@ -179,9 +179,13 @@ class songWritingApi(Resource):
     # try to create chords using the data from js request
     try:
         chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords, args.melodyNotes))
+        chordNotes = []
+        for c in chords:
+            chordNotes.append(getNotesFromChordName(c))
         return {
             'resultStatus': 'SUCCESS',
             'chords': chords,
+            'chordNotes': chordNotes
         }
     except:
         return {
