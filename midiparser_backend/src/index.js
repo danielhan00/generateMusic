@@ -20,6 +20,7 @@ function readMidi(fileName) {
       measureDuration = (240 / bpm) * (timeSignature[0] / timeSignature[1])
       bars = parseBars(notes, measureDuration)
       notesInBar = noteDictionary(bars)
+      console.log(notesInBar)
       console.log(measureDuration)
       console.log(bars[1])
       console.log(getNoteData(measureDuration, bars))
@@ -47,7 +48,7 @@ function numberToNoteNames(noteArray) {
 
 // creates a dictionary of barDuration number corresponding to note names in that barDuration
 function noteDictionary(bars) {
-  let dict = new Object()
+  let dict = []
   for (const [key, value] of Object.entries(bars)) {
     dict[key] = numberToNoteNames(value)
     //console.log(key, dict[key])

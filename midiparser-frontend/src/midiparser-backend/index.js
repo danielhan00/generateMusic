@@ -49,11 +49,23 @@ function numberToNoteNames(noteArray) {
   return notes
 }
 
+function justPitches(noteArray) {
+  const notes = []
+  for (var i = 0; i < noteArray.length; i++) {
+    const noteName = Midi.midiToNoteName(noteArray[i].midi)
+    noteName = noteName.replace(/[0-9]/g, '')
+    notes.push(noteName)
+  }
+  //console.log(notes)
+  //console.log(detect(notes))
+  return notes
+}
+
 // creates a dictionary of barDuration number corresponding to note names in that barDuration
 function noteDictionary(bars) {
-  let dict = new Object()
+  let dict = []
   for (const [key, value] of Object.entries(bars)) {
-    dict[key] = numberToNoteNames(value)
+    dict[key] = justPitches(value)
     //console.log(key, dict[key])
   }
   return dict
@@ -240,4 +252,5 @@ export {
   getFirstChannel,
   getNoteData,
   orderData,
+  noteDictionary
 }
