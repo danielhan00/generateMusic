@@ -323,11 +323,14 @@ class secondOrderMarkovChain():
                     factor = factor + 1.0
             average_possibility = average_possibility / factor
             direct_possibility_chart[next_stat_to_spit] = average_possibility
-            # -----------REVISE--------------
-            for one_key in direct_possibility_chart.keys():
-                if direct_possibility_chart.get(one_key) < (1.0 / len(direct_possibility_chart.keys())):
-                    one_popped_off_possibility = direct_possibility_chart.pop(one_key)
-                    direct_popped_possibility_sum = direct_popped_possibility_sum + one_popped_off_possibility
+        keys_to_remove = []
+        for one_key in direct_possibility_chart.keys():
+            if direct_possibility_chart.get(one_key) < (1.0 / len(direct_possibility_chart.keys())):
+                keys_to_remove.append(one_key)
+                one_popped_off_possibility = direct_possibility_chart.get(one_key)
+                direct_popped_possibility_sum = direct_popped_possibility_sum + one_popped_off_possibility
+        for one_key_to_remove in keys_to_remove:
+            direct_possibility_chart.pop(one_key_to_remove)
 
         for next_stat_to_spit in prev_static_markov.keys():
             average_possibility = 0.0
@@ -339,18 +342,23 @@ class secondOrderMarkovChain():
                 factor = factor + 1.0
             average_possibility = average_possibility / factor
             prev_possibility_chart[next_stat_to_spit] = average_possibility
-            # ---------revise------------
-            for one_key in prev_possibility_chart.keys():
-                if prev_possibility_chart.get(one_key) < (1.0 / len(prev_possibility_chart.keys())):
-                    one_popped_off_possibility = prev_possibility_chart.pop(one_key)
-                    prev_popped_possibility_sum = prev_popped_possibility_sum + one_popped_off_possibility
+        keys_to_remove = []
+        for one_key in prev_possibility_chart.keys():
+            if prev_possibility_chart.get(one_key) < (1.0 / len(prev_possibility_chart.keys())):
+                keys_to_remove.append(one_key)
+                one_popped_off_possibility = prev_possibility_chart.get(one_key)
+                prev_popped_possibility_sum = prev_popped_possibility_sum + one_popped_off_possibility
+        for one_key_to_remove in keys_to_remove:
+            prev_possibility_chart.pop(one_key_to_remove)
 
         pnpp_possibility_chart = pnpp_static_markov.get(self._running_prev_prev_stat).get(self._running_prev_stat)
-        # ---------------revise------------
+        keys_to_remove = []
         for one_key in pnpp_possibility_chart.keys():
             if pnpp_possibility_chart.get(one_key) < (1.0 / len(pnpp_possibility_chart.keys())):
-                one_popped_off_possibility = pnpp_possibility_chart.pop(one_key)
+                one_popped_off_possibility = pnpp_possibility_chart.get(one_key)
                 pnpp_popped_possibility_sum = pnpp_popped_possibility_sum + one_popped_off_possibility
+        for one_key_to_remove in keys_to_remove:
+            pnpp_possibility_chart.pop(one_key_to_remove)
 
         # And now the possibility charts are static
         # -------------------------------------------------------------------------------------------
@@ -417,6 +425,7 @@ class secondOrderMarkovChain():
             print(one_str)
 
         return result
+
 
     # TO GENERATE ONE CHORD RECURSIVELY UNTIL IT IS ACCEPTED
     def generate_one_chord_and_evaluate(self, generate_type_flag: int, possibility_chart: Dict, has_melody: bool,
