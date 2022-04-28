@@ -298,15 +298,76 @@ class secondOrderMarkovChain():
         # Initialize the string list shooting to the front-end
         result = []
 
+        # ------------------------------------------------------------------------------------
+        # Before generating the chord, get the corresponding possibility charts
+        direct_possibility_chart = {}
+        prev_possibility_chart = {}
+        pnpp_possibility_chart = {}
+
+        direct_static_markov = self._markov_chain_table
+        prev_static_markov = self._markov_chain_table
+        pnpp_static_markov = self._markov_chain_table
+
+        direct_popped_possibility_sum = 0
+        prev_popped_possibility_sum = 0
+        pnpp_popped_possibility_sum = 0
+
+        for next_stat_to_spit in direct_static_markov.keys():
+            average_possibility = 0.0
+            factor = 0.0
+            for prev_prev_stat in direct_static_markov.keys():
+                for prev_stat in direct_static_markov.get(prev_prev_stat).keys():
+                    this_prev_possibility \
+                        = direct_static_markov.get(prev_prev_stat).get(prev_stat)[next_stat_to_spit]
+                    average_possibility = average_possibility + this_prev_possibility
+                    factor = factor + 1.0
+            average_possibility = average_possibility / factor
+            direct_possibility_chart[next_stat_to_spit] = average_possibility
+            # -----------REVISE--------------
+            for one_key in direct_possibility_chart.keys():
+                if direct_possibility_chart.get(one_key) < (1.0 / len(direct_possibility_chart.keys())):
+                    one_popped_off_possibility = direct_possibility_chart.pop(one_key)
+                    direct_popped_possibility_sum = direct_popped_possibility_sum + one_popped_off_possibility
+
+        for next_stat_to_spit in prev_static_markov.keys():
+            average_possibility = 0.0
+            factor = 0.0
+            for prev_prev_stat in prev_static_markov.keys():
+                this_prev_prev_possibility \
+                    = prev_static_markov.get(prev_prev_stat).get(self._running_prev_stat)[next_stat_to_spit]
+                average_possibility = average_possibility + this_prev_prev_possibility
+                factor = factor + 1.0
+            average_possibility = average_possibility / factor
+            prev_possibility_chart[next_stat_to_spit] = average_possibility
+            # ---------revise------------
+            for one_key in prev_possibility_chart.keys():
+                if prev_possibility_chart.get(one_key) < (1.0 / len(prev_possibility_chart.keys())):
+                    one_popped_off_possibility = prev_possibility_chart.pop(one_key)
+                    prev_popped_possibility_sum = prev_popped_possibility_sum + one_popped_off_possibility
+
+        pnpp_possibility_chart = pnpp_static_markov.get(self._running_prev_prev_stat).get(self._running_prev_stat)
+        # ---------------revise------------
+        for one_key in pnpp_possibility_chart.keys():
+            if pnpp_possibility_chart.get(one_key) < (1.0 / len(pnpp_possibility_chart.keys())):
+                one_popped_off_possibility = pnpp_possibility_chart.pop(one_key)
+                pnpp_popped_possibility_sum = pnpp_popped_possibility_sum + one_popped_off_possibility
+
+        # And now the possibility charts are static
+        # -------------------------------------------------------------------------------------------
+
         # generate first chord
-        first_chord = self.generate_one_chord_and_evaluate(1, has_melody, key, mode, melody_notes[0])
+        first_chord \
+            = self.generate_one_chord_and_evaluate(1, direct_possibility_chart, has_melody, key, mode, melody_notes[0],
+                                                   direct_popped_possibility_sum)
         self._running_prev_stat = first_chord
         result.append(first_chord.get_status_name())
 
         if num_chord >= 2:
             # One-step resolve
             if num_chord == 2:
-                second_and_last_chord = self.generate_one_chord_and_evaluate(4, has_melody, key, mode, melody_notes[1])
+                second_and_last_chord \
+                    = self.generate_one_chord_and_evaluate(2, prev_possibility_chart, has_melody, key, mode,
+                                                           melody_notes[1], prev_popped_possibility_sum)
                 self._running_prev_prev_stat = self._running_prev_stat
                 self._running_prev_stat = second_and_last_chord
                 result.append(second_and_last_chord.get_status_name())
@@ -318,15 +379,19 @@ class secondOrderMarkovChain():
                 while current_chord <= num_chord - 2:
                     # The first random is determined by the average possibility of the 2nd-order markov chain
                     if current_chord == 2:
-                        second_chord = self.generate_one_chord_and_evaluate(2, has_melody, key, mode, melody_notes[1])
+                        second_chord \
+                            = self.generate_one_chord_and_evaluate(1, prev_possibility_chart, has_melody, key, mode,
+                                                                   melody_notes[1], prev_popped_possibility_sum)
                         self._running_prev_prev_stat = self._running_prev_stat
                         self._running_prev_stat = second_chord
                         result.append(second_chord.get_status_name())
 
                     # The rest is exactly the possibility in the 2nd-order markov chain
                     else:
-                        new_chord = self.generate_one_chord_and_evaluate(3, has_melody, key,
-                                                                         mode, melody_notes[current_chord - 1])
+                        new_chord \
+                            = self.generate_one_chord_and_evaluate(1, pnpp_possibility_chart, has_melody, key, mode,
+                                                                   melody_notes[current_chord - 1],
+                                                                   pnpp_popped_possibility_sum)
                         self._running_prev_prev_stat = self._running_prev_stat
                         self._running_prev_stat = new_chord
                         result.append(new_chord.get_status_name())
@@ -334,45 +399,42 @@ class secondOrderMarkovChain():
                     current_chord = current_chord + 1
 
                 # two-step resolve
-                second_last_chord = self.generate_one_chord_and_evaluate(4, has_melody, key,
-                                                                         mode, melody_notes[num_chord - 2])
+                second_last_chord \
+                    = self.generate_one_chord_and_evaluate(2, prev_possibility_chart, has_melody, key, mode,
+                                                           melody_notes[num_chord - 2], prev_popped_possibility_sum)
                 self._running_prev_prev_stat = self._running_prev_stat
                 self._running_prev_stat = second_last_chord
                 result.append(second_last_chord.get_status_name())
 
-                last_chord = self.generate_one_chord_and_evaluate(4, has_melody, key, mode, melody_notes[num_chord - 1])
+                last_chord \
+                    = self.generate_one_chord_and_evaluate(2, prev_possibility_chart, has_melody, key, mode,
+                                                           melody_notes[num_chord - 1], prev_popped_possibility_sum)
                 self._running_prev_prev_stat = self._running_prev_stat
                 self._running_prev_stat = last_chord
                 result.append(last_chord.get_status_name())
 
-        for onestr in result:
-            print(onestr)
+        for one_str in result:
+            print(one_str)
 
         return result
 
     # TO GENERATE ONE CHORD RECURSIVELY UNTIL IT IS ACCEPTED
-    def generate_one_chord_and_evaluate(self, generate_type_flag: int, has_melody: bool, key: str,
-                                        mode: str, measure_notes: List[str]) -> status:
+    def generate_one_chord_and_evaluate(self, generate_type_flag: int, possibility_chart: Dict, has_melody: bool,
+                                        key: str, mode: str, measure_notes: List[str],
+                                        reduced_possibility_sum: float) -> status:
         chord_accepted = False
         attempt = 0
         while (not chord_accepted) and (attempt < 30):
             attempt = attempt + 1
             new_chord: status
-            # 1: itself
-            # 2: based on prev
-            # 3: based on prev and prev_prev
-            # 4: resolve based on prev
+            # 1: generate
+            # 2: resolve
             if generate_type_flag == 1:
-                new_chord = self.generated_one_chord_itself()
+                new_chord = self.generated_one_chord(possibility_chart, reduced_possibility_sum)
             elif generate_type_flag == 2:
-                new_chord = self.generated_one_chord_base_on_prev(self._running_prev_stat)
-            elif generate_type_flag == 3:
-                new_chord \
-                    = self.generated_one_chord_base_on_pnpp(self._running_prev_stat, self._running_prev_prev_stat)
-            elif generate_type_flag == 4:
                 new_chord = self.resolve_one_chord_base_on_prev(self._running_prev_stat)
             else:
-                raise ValueError('Up till now generate types only have 1, 2, 3, and 4')
+                raise ValueError('Dude, pass in a 1 or 2 for the flag')
 
             new_chord_name = new_chord.get_status_name()
 
@@ -385,103 +447,9 @@ class secondOrderMarkovChain():
         return new_chord
 
     # TO GENERATE ONE CHORD (NAME) REGARDLESS OF ANY PREV STATUS
-    def generated_one_chord_itself(self) -> status:
-        static_markov = self.get_markov_chain()
-
-        # We come up with the average possibility to transfer to other states
-        possibility_chart = {}
-
-        for next_stat_to_spit in static_markov.keys():
-            average_possibility = 0.0
-            factor = 0.0
-
-            for prev_prev_stat in static_markov.keys():
-                for prev_stat in static_markov.get(prev_prev_stat).keys():
-                    this_prev_possibility \
-                        = static_markov.get(prev_prev_stat).get(prev_stat)[next_stat_to_spit]
-                    average_possibility = average_possibility + this_prev_possibility
-                    factor = factor + 1.0
-
-            average_possibility = average_possibility / factor
-            possibility_chart[next_stat_to_spit] = average_possibility
-
-            # Reduce the chords that are too low in their possibilities
-            # We erase chords with possibilities lower than the average
-            popped_possibility_sum = 0
-            for one_key in possibility_chart.keys():
-                if possibility_chart.get(one_key) < (1.0 / len(possibility_chart.keys())):
-                    one_popped_off_possibility = possibility_chart.pop(one_key)
-                    popped_possibility_sum = popped_possibility_sum + one_popped_off_possibility
-
-        all_next_stat = list(possibility_chart.keys())
-        all_next_stat_possibility = list(possibility_chart.values())
-
-        # Randomly select one status
-        rand = (random.random()) * (1 - popped_possibility_sum)
-        get_stat_attempt = 0
-        while rand > 0:
-            rand = rand - all_next_stat_possibility[get_stat_attempt]
-            get_stat_attempt = get_stat_attempt + 1
-        result = all_next_stat[get_stat_attempt - 1]
-
-        return result
-
-    # TO GENERATE ONE CHORD (NAME) BASED ON THE PREVIOUS STATUS
-    def generated_one_chord_base_on_prev(self, prev_stat: status) -> status:
-        static_markov = self.get_markov_chain()
-
-        # We come up with the average possibility to transfer to other states
-        possibility_chart = {}
-
-        for next_stat_to_spit in static_markov.keys():
-            average_possibility = 0.0
-            factor = 0.0
-
-            for prev_prev_stat in static_markov.keys():
-                this_prev_prev_possibility \
-                    = static_markov.get(prev_prev_stat).get(self._running_prev_stat)[next_stat_to_spit]
-                average_possibility = average_possibility + this_prev_prev_possibility
-                factor = factor + 1.0
-
-            average_possibility = average_possibility / factor
-            possibility_chart[next_stat_to_spit] = average_possibility
-
-            # Reduce the chords that are too low in their possibilities
-            # We erase chords with possibilities lower than the average
-            popped_possibility_sum = 0
-            for one_key in possibility_chart.keys():
-                if possibility_chart.get(one_key) < (1.0 / len(possibility_chart.keys())):
-                    one_popped_off_possibility = possibility_chart.pop(one_key)
-                    popped_possibility_sum = popped_possibility_sum + one_popped_off_possibility
-
-        all_next_stat = list(possibility_chart.keys())
-        all_next_stat_possibility = list(possibility_chart.values())
-
-        # Randomly select one status
-        rand = (random.random()) * (1 - popped_possibility_sum)
-        get_stat_attempt = 0
-        while rand > 0:
-            rand = rand - all_next_stat_possibility[get_stat_attempt]
-            get_stat_attempt = get_stat_attempt + 1
-        result = all_next_stat[get_stat_attempt - 1]
-
-        return result
-
-    # TO GENERATE ONE CHORD (NAME) BASED ON THE PREVIOUS STATUS AND THE PREVIOUS-PREVIOUS STATUS
-    def generated_one_chord_base_on_pnpp(self, prev_stat: status, prev_prev_stat: status) -> status:
-        # Get the 1D possibility chart directly
-        possibility_chart = self._markov_chain_table.get(self._running_prev_prev_stat).get(self._running_prev_stat)
-
-        # Reduce the chords that are too low in their possibilities
-        # We erase chords with possibilities lower than the average
-        popped_possibility_sum = 0
-        for one_key in possibility_chart.keys():
-            if possibility_chart.get(one_key) < (1.0 / len(possibility_chart.keys())):
-                one_popped_off_possibility = possibility_chart.pop(one_key)
-                popped_possibility_sum = popped_possibility_sum + one_popped_off_possibility
-
-        all_next_stat = list(possibility_chart.keys())
-        all_next_stat_possibility = list(possibility_chart.values())
+    def generated_one_chord(self, possibility_chart: Dict, popped_possibility_sum: float) -> status:
+        all_next_stat = possibility_chart.keys()
+        all_next_stat_possibility = possibility_chart.values()
 
         # Randomly select one status
         rand = (random.random()) * (1 - popped_possibility_sum)
