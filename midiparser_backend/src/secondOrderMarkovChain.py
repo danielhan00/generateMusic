@@ -1,8 +1,10 @@
 # To represent a second_order markov chain
 # Such that different status have chances (sum to 1) to transfer to the next status
-from .markovUtility import validateChords
+
+import imp
 from typing import Any, Dict, List
 from midiparser_backend.src.status import Any, status
+from midiparser_backend.src.markovUtility import Any, validateChords
 #from Markov_Chain.status import Any, status
 import random
 
@@ -272,8 +274,8 @@ class secondOrderMarkovChain():
     # TO RUN THE SECOND-ORDER MARKOV CHAIN
     # THIS IS THE MAJOR FUNCTION THAT OUTPUT THE CHORD PROGRESSION TO THE FRONT-END
     # ******************************************************************************
-    def run(self, num_chord: int, melody_notes: List[List[str]]) -> List[str]:
-        # The system generates chords randomly one by one
+        def run(self, has_melody: bool, num_chord: int, key: str, mode: str, melody_notes: List[List[str]]) -> List[str]:
+            # The system generates chords randomly one by one
         # The system recursively generate it until it is acceptable
         # We are doing so because this is the dot product of:
         #    -- Each chord is generated individually based on the result of machine learning
@@ -297,14 +299,14 @@ class secondOrderMarkovChain():
         result = []
 
         # generate first chord
-        first_chord = self.generate_one_chord_and_evaluate(1, melody_notes[0])
+        first_chord = self.generate_one_chord_and_evaluate(1, has_melody, key, mode, melody_notes[0])
         self._running_prev_stat = first_chord
         result.append(first_chord.get_status_name())
 
         if num_chord >= 2:
             # One-step resolve
             if num_chord == 2:
-                second_and_last_chord = self.generate_one_chord_and_evaluate(4, melody_notes[1])
+                second_and_last_chord = self.generate_one_chord_and_evaluate(4, has_melody, key, mode, melody_notes[1])
                 self._running_prev_prev_stat = self._running_prev_stat
                 self._running_prev_stat = second_and_last_chord
                 result.append(second_and_last_chord.get_status_name())
@@ -316,14 +318,15 @@ class secondOrderMarkovChain():
                 while current_chord <= num_chord - 2:
                     # The first random is determined by the average possibility of the 2nd-order markov chain
                     if current_chord == 2:
-                        second_chord = self.generate_one_chord_and_evaluate(2, melody_notes[1])
+                        second_chord = self.generate_one_chord_and_evaluate(2, has_melody, key, mode, melody_notes[1])
                         self._running_prev_prev_stat = self._running_prev_stat
                         self._running_prev_stat = second_chord
                         result.append(second_chord.get_status_name())
 
                     # The rest is exactly the possibility in the 2nd-order markov chain
                     else:
-                        new_chord = self.generate_one_chord_and_evaluate(3, melody_notes[current_chord - 1])
+                        new_chord = self.generate_one_chord_and_evaluate(3, has_melody, key,
+                                                                         mode, melody_notes[current_chord - 1])
                         self._running_prev_prev_stat = self._running_prev_stat
                         self._running_prev_stat = new_chord
                         result.append(new_chord.get_status_name())
@@ -331,12 +334,13 @@ class secondOrderMarkovChain():
                     current_chord = current_chord + 1
 
                 # two-step resolve
-                second_last_chord = self.generate_one_chord_and_evaluate(4, melody_notes[num_chord - 2])
+                second_last_chord = self.generate_one_chord_and_evaluate(4, has_melody, key,
+                                                                         mode, melody_notes[num_chord - 2])
                 self._running_prev_prev_stat = self._running_prev_stat
                 self._running_prev_stat = second_last_chord
                 result.append(second_last_chord.get_status_name())
 
-                last_chord = self.generate_one_chord_and_evaluate(4, melody_notes[num_chord - 1])
+                last_chord = self.generate_one_chord_and_evaluate(4, has_melody, key, mode, melody_notes[num_chord - 1])
                 self._running_prev_prev_stat = self._running_prev_stat
                 self._running_prev_stat = last_chord
                 result.append(last_chord.get_status_name())
@@ -347,7 +351,8 @@ class secondOrderMarkovChain():
         return result
 
     # TO GENERATE ONE CHORD RECURSIVELY UNTIL IT IS ACCEPTED
-    def generate_one_chord_and_evaluate(self, generate_type_flag: int, measure_notes: List[str]) -> status:
+    def generate_one_chord_and_evaluate(self, generate_type_flag: int, has_melody: bool, key: str,
+                                        mode: str, measure_notes: List[str]) -> status:
         chord_accepted = False
         attempt = 0
         while (not chord_accepted) and (attempt < 30):
@@ -370,8 +375,11 @@ class secondOrderMarkovChain():
                 raise ValueError('Up till now generate types only have 1, 2, 3, and 4')
 
             new_chord_name = new_chord.get_status_name()
-            if self.acceptable(new_chord_name, measure_notes):
-                #validateChords(key,tonality,new_chord_name, measure_notes)
+
+            if has_melody:
+                if validateChords(key, mode, new_chord_name, measure_notes):
+                    chord_accepted = True
+            else:
                 chord_accepted = True
 
         return new_chord
@@ -465,60 +473,60 @@ class secondOrderMarkovChain():
         rand = (random.random()) * 4.0
         if prev_stat.get_status_name().__contains__('i') or prev_stat.get_status_name().__contains__('I'):
             if rand < 1.0:
-                return status('i')
+                return status('I')
             elif 1.0 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('ii') or prev_stat.get_status_name().__contains__('II'):
             if rand < 1.0:
-                return status('i')
+                return status('I')
             elif 1.0 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('iii') or prev_stat.get_status_name().__contains__('III'):
             if rand < 0.25:
-                return status('i')
+                return status('I')
             elif 0.25 <= rand < 3.25:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('iv') or prev_stat.get_status_name().__contains__('IV'):
             if rand < 1.0:
-                return status('i')
+                return status('I')
             elif 1.0 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('v') or prev_stat.get_status_name().__contains__('V'):
             if rand < 0.5:
-                return status('v')
+                return status('V')
             elif 0.5 <= rand < 3.5:
-                return status('i')
+                return status('I')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('vi') or prev_stat.get_status_name().__contains__('VI'):
             if rand < 1.0:
-                return status('i')
+                return status('I')
             elif 1.0 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('vii') or prev_stat.get_status_name().__contains__('VII'):
             if rand < 1.75:
-                return status('i')
+                return status('I')
             elif 1.75 <= rand < 3.75:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         else:
             if rand < 1.5:
-                return status('i')
+                return status('I')
             elif 1.5 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
 
     # TO DETERMINE IF ONE CHORD IS ACCEPTABLE WITH THE GIVEN MELODY
     def acceptable(self, chord_name: str, measure_notes) -> bool:
