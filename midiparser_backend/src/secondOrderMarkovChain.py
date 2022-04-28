@@ -298,16 +298,8 @@ class secondOrderMarkovChain():
         # Initialize the string list shooting to the front-end
         result = []
 
-        # ------------------------------------------------------------------------------------
-        # Before generating the chord, get the corresponding possibility charts
         direct_possibility_chart = {}
-        prev_possibility_chart = {}
-        pnpp_possibility_chart = {}
-
         direct_popped_possibility_sum = 0
-        prev_popped_possibility_sum = 0
-        pnpp_popped_possibility_sum = 0
-
         for next_stat_to_spit in self._markov_chain_table.keys():
             average_possibility = 0.0
             factor = 0.0
@@ -328,6 +320,16 @@ class secondOrderMarkovChain():
         for one_key_to_remove in keys_to_remove:
             direct_possibility_chart.pop(one_key_to_remove)
 
+        # generate first chord
+        first_chord \
+            = self.generate_one_chord_and_evaluate(1, direct_possibility_chart, has_melody, key, mode, melody_notes[0],
+                                                   direct_popped_possibility_sum)
+        self._running_prev_stat = first_chord
+        result.append(first_chord.get_status_name())
+
+        # Get the possibility chart for the second
+        prev_possibility_chart = {}
+        prev_popped_possibility_sum = 0
         for next_stat_to_spit in self._markov_chain_table.keys():
             average_possibility = 0.0
             factor = 0.0
@@ -346,25 +348,6 @@ class secondOrderMarkovChain():
                 prev_popped_possibility_sum = prev_popped_possibility_sum + one_popped_off_possibility
         for one_key_to_remove in keys_to_remove:
             prev_possibility_chart.pop(one_key_to_remove)
-
-        pnpp_possibility_chart = self._markov_chain_table.get(self._running_prev_prev_stat).get(self._running_prev_stat)
-        keys_to_remove = []
-        for one_key in pnpp_possibility_chart.keys():
-            if pnpp_possibility_chart.get(one_key) < (1.0 / len(pnpp_possibility_chart.keys())):
-                one_popped_off_possibility = pnpp_possibility_chart.get(one_key)
-                pnpp_popped_possibility_sum = pnpp_popped_possibility_sum + one_popped_off_possibility
-        for one_key_to_remove in keys_to_remove:
-            pnpp_possibility_chart.pop(one_key_to_remove)
-
-        # And now the possibility charts are static
-        # -------------------------------------------------------------------------------------------
-
-        # generate first chord
-        first_chord \
-            = self.generate_one_chord_and_evaluate(1, direct_possibility_chart, has_melody, key, mode, melody_notes[0],
-                                                   direct_popped_possibility_sum)
-        self._running_prev_stat = first_chord
-        result.append(first_chord.get_status_name())
 
         if num_chord >= 2:
             # One-step resolve
@@ -392,6 +375,17 @@ class secondOrderMarkovChain():
 
                     # The rest is exactly the possibility in the 2nd-order markov chain
                     else:
+                        pnpp_popped_possibility_sum = 0
+                        pnpp_possibility_chart = self._markov_chain_table.get(self._running_prev_prev_stat).get(
+                            self._running_prev_stat)
+                        keys_to_remove = []
+                        for one_key in pnpp_possibility_chart.keys():
+                            if pnpp_possibility_chart.get(one_key) < (1.0 / len(pnpp_possibility_chart.keys())):
+                                one_popped_off_possibility = pnpp_possibility_chart.get(one_key)
+                                pnpp_popped_possibility_sum = pnpp_popped_possibility_sum + one_popped_off_possibility
+                        for one_key_to_remove in keys_to_remove:
+                            pnpp_possibility_chart.pop(one_key_to_remove)
+
                         new_chord \
                             = self.generate_one_chord_and_evaluate(1, pnpp_possibility_chart, has_melody, key, mode,
                                                                    melody_notes[current_chord - 1],
@@ -443,9 +437,8 @@ class secondOrderMarkovChain():
             new_chord_name = new_chord.get_status_name()
 
             if has_melody:
-                #if validateChords(key, mode, new_chord_name, measure_notes):
-                #   chord_accepted = True
-                chord_accepted = True
+                if validateChords(key, mode, new_chord_name, measure_notes):
+                    chord_accepted = True
             else:
                 chord_accepted = True
 
