@@ -266,7 +266,7 @@ class secondOrderMarkovChain():
             new_Markov_Chain[prev_prev_status] = this_prev_prev_stat_table
 
         self._markov_chain_table = new_Markov_Chain
-
+        
     # -----------------------------------------------------
     # -------------------- THE RUNNER ---------------------
     # -----------------------------------------------------
@@ -274,8 +274,8 @@ class secondOrderMarkovChain():
     # TO RUN THE SECOND-ORDER MARKOV CHAIN
     # THIS IS THE MAJOR FUNCTION THAT OUTPUT THE CHORD PROGRESSION TO THE FRONT-END
     # ******************************************************************************
-        def run(self, has_melody: bool, num_chord: int, key: str, mode: str, melody_notes: List[List[str]]) -> List[str]:
-            # The system generates chords randomly one by one
+    def run(self, has_melody: bool, num_chord: int, key: str, mode: str, melody_notes: List[List[str]]) -> List[str]:
+        # The system generates chords randomly one by one
         # The system recursively generate it until it is acceptable
         # We are doing so because this is the dot product of:
         #    -- Each chord is generated individually based on the result of machine learning
@@ -405,11 +405,19 @@ class secondOrderMarkovChain():
             average_possibility = average_possibility / factor
             possibility_chart[next_stat_to_spit] = average_possibility
 
+            # Reduce the chords that are too low in their possibilities
+            # We erase chords with possibilities lower than the average
+            popped_possibility_sum = 0
+            for one_key in possibility_chart.keys():
+                if possibility_chart.get(one_key) < (1.0 / len(possibility_chart.keys())):
+                    one_popped_off_possibility = possibility_chart.pop(one_key)
+                    popped_possibility_sum = popped_possibility_sum + one_popped_off_possibility
+
         all_next_stat = list(possibility_chart.keys())
         all_next_stat_possibility = list(possibility_chart.values())
 
         # Randomly select one status
-        rand = random.random()
+        rand = (random.random()) * (1 - popped_possibility_sum)
         get_stat_attempt = 0
         while rand > 0:
             rand = rand - all_next_stat_possibility[get_stat_attempt]
@@ -438,11 +446,19 @@ class secondOrderMarkovChain():
             average_possibility = average_possibility / factor
             possibility_chart[next_stat_to_spit] = average_possibility
 
+            # Reduce the chords that are too low in their possibilities
+            # We erase chords with possibilities lower than the average
+            popped_possibility_sum = 0
+            for one_key in possibility_chart.keys():
+                if possibility_chart.get(one_key) < (1.0 / len(possibility_chart.keys())):
+                    one_popped_off_possibility = possibility_chart.pop(one_key)
+                    popped_possibility_sum = popped_possibility_sum + one_popped_off_possibility
+
         all_next_stat = list(possibility_chart.keys())
         all_next_stat_possibility = list(possibility_chart.values())
 
         # Randomly select one status
-        rand = random.random()
+        rand = (random.random()) * (1 - popped_possibility_sum)
         get_stat_attempt = 0
         while rand > 0:
             rand = rand - all_next_stat_possibility[get_stat_attempt]
@@ -455,11 +471,20 @@ class secondOrderMarkovChain():
     def generated_one_chord_base_on_pnpp(self, prev_stat: status, prev_prev_stat: status) -> status:
         # Get the 1D possibility chart directly
         possibility_chart = self._markov_chain_table.get(self._running_prev_prev_stat).get(self._running_prev_stat)
+
+        # Reduce the chords that are too low in their possibilities
+        # We erase chords with possibilities lower than the average
+        popped_possibility_sum = 0
+        for one_key in possibility_chart.keys():
+            if possibility_chart.get(one_key) < (1.0 / len(possibility_chart.keys())):
+                one_popped_off_possibility = possibility_chart.pop(one_key)
+                popped_possibility_sum = popped_possibility_sum + one_popped_off_possibility
+
         all_next_stat = list(possibility_chart.keys())
         all_next_stat_possibility = list(possibility_chart.values())
 
         # Randomly select one status
-        rand = random.random()
+        rand = (random.random()) * (1 - popped_possibility_sum)
         get_stat_attempt = 0
         while rand > 0:
             rand = rand - all_next_stat_possibility[get_stat_attempt]
