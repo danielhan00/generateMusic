@@ -2,12 +2,17 @@
     text-align: center;
     height: 10vh;
     width: 100vw;
-    background-color: darkblue;
+    background-color: #2525c4;
 }
 
 .NavText {
     color: white;
     font-size: 20px;
+
+}
+
+.NavText:hover {
+    color: rgb(255, 247, 140);
 }
 
 .App {
