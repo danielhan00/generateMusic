@@ -39,3 +39,11 @@
     padding: 30px;
     font-weight: bold;
 }
+
+.SmallBarrier {
+    height: 2vh
+}
+
+.InvisibleText {
+    color:rgb(91, 91, 216);
+}

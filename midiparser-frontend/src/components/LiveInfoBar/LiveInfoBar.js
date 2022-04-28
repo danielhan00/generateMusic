@@ -29,10 +29,6 @@ export const LiveInfoBar = (props) => {
                 <td className="InfoField">
                     <text>Key</text>
                     <DropdownMenu playing={props.playing} buttonName={props.keyLetter} onClick={props.keyLetterClick} buttonOptions={['Ab', 'A', 'Bb', 'B', 'C', 'C#', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'Gb', 'G']}></DropdownMenu>
-
-                </td>
-                <td className="InfoField">
-                    <text>Tonality</text>
                     <DropdownMenu playing={props.playing} buttonName={props.keyQuality} onClick={props.keyQualityClick} buttonOptions={['Major', 'Minor']}></DropdownMenu>
                 </td>
                 <td className="InfoField">
@@ -43,7 +39,10 @@ export const LiveInfoBar = (props) => {
                     <CounterTextField playing={props.playing} onChange={props.setChordLength} input={props.chordLength} min='1' max='128'></CounterTextField>
                 </td>
                 <td className="InfoField">
-                    <AButton playing={props.playing} onClick={props.changeChords} clickVar={props.currChordProg} buttonName="Change Chords"></AButton> 
+                    <AButton playing={props.playing} onClick={props.changeChords} clickVar={props.currChordProg} buttonName="Change Chords"></AButton>
+                    <div className="SmallBarrier"/>
+                    <text>Accompaniment</text>
+                    <DropdownMenu playing={props.playing} buttonName={props.accompaniment} onClick={props.setAccompaniment} buttonOptions={['None', 'Piano', 'Clavinet', 'Guitar', 'Orchestra', 'Synth', 'Vibraphone', 'Metronome']}></DropdownMenu> 
                 </td>
             </tr>
         </table>

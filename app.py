@@ -90,8 +90,10 @@ def train_markov_chains():
         genre_map[key].refresh_mc()
         #genre_map[key].write_markov_chain_to_file()
         print(key)
+    # genre_map['Pop_Major'].refresh_mc()
+    # genre_map['Pop_Minor'].refresh_mc()
 train_markov_chains()
-#print(findAllChords('A', genre_map.get('Rock_Minor').run(5)))
+print(findAllChords('A', genre_map.get('Pop_Minor').run(False, 5, 'A', 'Minor', [['a'],['a'],['a'],['a'],['a']])))
 
 # NOT USED: reading markov chain takes too long
 def read_markov_chain(genre: str):
@@ -132,21 +134,26 @@ class livePerformanceApi(Resource):
     melodyNotes = []
     x = 0
     while (x < args.numChords):
-        melodyNotes.append(['a'])
+        melodyNotes.append(['A'])
         x += 1
 
     # try to create chords using the data from js request
     #try:
-    chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords, melodyNotes))
-    return {
-        'resultStatus': 'SUCCESS',
-        'chords': chords,
-      }
-#    # except:
-#         return {
-#             'resultStatus': 'FAILURE',
-#             'chords': ['Request', 'Failed']
-#         }
+    chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(False, args.numChords, args.key, args.tonality, melodyNotes))
+    chordNotes = []
+    for c in chords:
+        chordNotes.append(getNotesFromChordName(c))
+    try:
+        return {
+            'resultStatus': 'SUCCESS',
+            'chords': chords,
+            'chordNotes' : chordNotes
+        }
+    except:
+        return {
+            'resultStatus': 'FAILURE',
+            'chords': ['Request', 'Failed']
+        }
 
 api.add_resource(livePerformanceApi, '/flask/getchords')
 
@@ -177,11 +184,12 @@ class songWritingApi(Resource):
     args = parser.parse_args()
 
     # try to create chords using the data from js request
+    #try:
+    chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(True, args.numChords, args.key, args.tonality, args.melodyNotes))
+    chordNotes = []
+    for c in chords:
+        chordNotes.append(getNotesFromChordName(c))
     try:
-        chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(args.numChords, args.melodyNotes))
-        chordNotes = []
-        for c in chords:
-            chordNotes.append(getNotesFromChordName(c))
         return {
             'resultStatus': 'SUCCESS',
             'chords': chords,

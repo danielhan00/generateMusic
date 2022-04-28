@@ -3,12 +3,15 @@ import { LiveInfoBar } from '../LiveInfoBar/LiveInfoBar';
 import { ChordDisplay } from '../ChordDisplay/ChordDisplay';
 import './LivePerformanceTool.css'
 import axios from 'axios'
+import Soundfont from 'soundfont-player'
+import metAudio from './metronome.wav'
 
 export const LivePerformanceTool = (props) => {
     // includes starter chord sequence
     const [chordMessage, setChordMessage] = useState({
         data: {
-            chords: ["Amin", "C", "F", "E7"]
+            chords: ["Amin", "C", "F", "E7"],
+            chordNotes: [["A", "C", "E"], ["C", "E", "G"], ["F", "A", "C"], ["E", "G#", "B", "D"]]
         }
     })
 
@@ -29,6 +32,7 @@ export const LivePerformanceTool = (props) => {
     const [currChordNum, setCurrChordNum] = useState(0);
     const [nextChord, setNextChord] = useState((chordMessage.data.chords)[1]);
 
+    // variables for tempo and counting related actions
     const [tempo, setTempo] = useState(120);
     const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
     const [timeSigDenom, setTimeSigDenom] = useState(4);
@@ -37,7 +41,13 @@ export const LivePerformanceTool = (props) => {
     // controls whether the tool is playing/counting
     const [isActive, setIsActive] = useState(false);
 
+    // integer for counting how many progressions are generated
     const [changeChords, setChangeChords] = useState(0);
+
+    // accompaniment style for sound playback
+    const [accompaniment, setAccompaniment] = useState('acoustic_grand_piano');
+    const [accompanimentName, setAccompanimentName] = useState('Piano');
+    const metronomeSound = new Audio(metAudio);
 
     useEffect(() => {
         axios.post('http://localhost:5000/flask/getchords',
@@ -68,7 +78,12 @@ export const LivePerformanceTool = (props) => {
     }, [])
 
     function toggle() {
-        setIsActive(!isActive);
+        var activeNow = !isActive
+        setIsActive(activeNow)
+        if (activeNow) {
+            if (accompaniment == 'metronome') metronomeSound.play();
+            else playChord(chordMessage.data.chordNotes[0])
+        }
     }
 
     function reset() {
@@ -78,12 +93,42 @@ export const LivePerformanceTool = (props) => {
         setCurrChordNum(0);
     }
 
+    function changeAccompaniment(accom) {
+        setAccompanimentName(accom)
+        if (accom === 'Piano') setAccompaniment('acoustic_grand_piano')
+        else if (accom === 'Clavinet') setAccompaniment('clavinet')
+        else if (accom === 'Guitar') setAccompaniment('electric_guitar_clean')
+        else if (accom === 'Orchestra') setAccompaniment('string_ensemble_1')
+        else if (accom === 'Synth') setAccompaniment('synth_brass_1')
+        else if (accom === 'Vibraphone') setAccompaniment('vibraphone')
+        else if (accom === 'Metronome') setAccompaniment('metronome')
+        else if (accom === 'None') setAccompaniment('none')
+    }
+
+    function playChord(notes) {
+        var ac = new AudioContext()
+        console.log("in play chords")
+        console.log(notes)
+        Soundfont.instrument(ac, accompaniment).then(function (instrument) {
+            if (accompaniment == 'none' || accompaniment == 'metronome') {
+                //do nothing
+            }
+            else {
+                notes.forEach(element =>
+                {
+                    instrument.play(element + '4', ac.currentTime, { duration: chordLength * (60/tempo)})
+                })
+            }
+          })
+    }
+
     // tracks time to update the current beat and chords
     useEffect(() => {
         let interval = null;
         if (isActive) {
             interval = setInterval(() => {
                 setCurrentBeat(currentBeat => (currentBeat % beatsPerMeasure + 1));
+                if (accompaniment == 'metronome') metronomeSound.play();
             }, 1000 * 60 / tempo);
         } else if (!isActive && currentBeat !== 1) {
             clearInterval(interval);
@@ -100,6 +145,7 @@ export const LivePerformanceTool = (props) => {
                 setCurrChordNum((currChordNum + 1) % numChords);
                 if (chordMessage.data.chords != undefined && chordMessage.data.chords != null) {
                     setCurrChord((chordMessage.data.chords)[(currChordNum + 1)% numChords]);
+                    playChord((chordMessage.data.chordNotes)[(currChordNum + 1)% numChords]);
                     setNextChord((chordMessage.data.chords)[(currChordNum + 2) % numChords]);
                 }
             }
@@ -117,7 +163,10 @@ export const LivePerformanceTool = (props) => {
 
     return <div className="LiveContainer">
         <ChordDisplay chordName={currChord} nextChordName={nextChord} progression={chordMessage.data.chords}></ChordDisplay>
-        <LiveInfoBar playing={isActive} togglePlay={toggle} currentBeat={currentBeat} genre={genre} genreOptions={genreMessage.data.genreOptions} genreChangeClick={setGenre}
+        <p>{accompaniment}</p>
+        <p>{accompanimentName}</p>
+        <LiveInfoBar playing={isActive} togglePlay={toggle} currentBeat={currentBeat} accompaniment={accompanimentName} setAccompaniment={changeAccompaniment}
+            genre={genre} genreOptions={genreMessage.data.genreOptions} genreChangeClick={setGenre}
             keyLetter={keyLetter} keyLetterClick={setKeyLetter} keyQuality={keyQuality} keyQualityClick={setKeyQuality} tempo={tempo} setTempo={setTempo}
             timeSigNum={beatsPerMeasure} setTimeSigNum={setBeatsPerMeasure} setTimeSigDenom={setTimeSigDenom} timeSigDenom={timeSigDenom} 
             numChords={numChords} setNumChords={setNumChords} chordLength={chordLength} setChordLength={setChordLength} changeChords={setChangeChords} currChordProg={changeChords}></LiveInfoBar>
