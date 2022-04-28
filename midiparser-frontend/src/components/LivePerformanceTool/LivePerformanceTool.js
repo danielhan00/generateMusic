@@ -163,8 +163,6 @@ export const LivePerformanceTool = (props) => {
 
     return <div className="LiveContainer">
         <ChordDisplay chordName={currChord} nextChordName={nextChord} progression={chordMessage.data.chords}></ChordDisplay>
-        <p>{accompaniment}</p>
-        <p>{accompanimentName}</p>
         <LiveInfoBar playing={isActive} togglePlay={toggle} currentBeat={currentBeat} accompaniment={accompanimentName} setAccompaniment={changeAccompaniment}
             genre={genre} genreOptions={genreMessage.data.genreOptions} genreChangeClick={setGenre}
             keyLetter={keyLetter} keyLetterClick={setKeyLetter} keyQuality={keyQuality} keyQualityClick={setKeyQuality} tempo={tempo} setTempo={setTempo}
