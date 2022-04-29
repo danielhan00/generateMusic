@@ -105,6 +105,40 @@ export const LivePerformanceTool = (props) => {
         else if (accom === 'None') setAccompaniment('none')
     }
 
+    // constant for finding octave relation of notes
+    const noteMap = new Map();
+    noteMap.set('C', 0)
+    noteMap.set('C#', 1)
+    noteMap.set('Db', 1)
+    noteMap.set('D#', 3)
+    noteMap.set('Eb', 3)
+    noteMap.set('E', 4)
+    noteMap.set('F', 5)
+    noteMap.set('F#', 6)
+    noteMap.set('Gb', 6)
+    noteMap.set('G', 7)
+    noteMap.set('G#', 8)
+    noteMap.set('Ab', 8)
+    noteMap.set('A', 9)
+    noteMap.set('A#', 10)
+    noteMap.set('Bb', 10)
+    noteMap.set('B', 11)
+
+    // helper function for deciding octaves of each note
+    // handles notes above the fifth differently for spreading out extensions above 7
+    function findOctave(noteName, rootName, currOctave, aboveFifth) {
+        let finalNum = currOctave;
+        if (noteMap.get(noteName) < noteMap.get(rootName)) {
+            finalNum += 1;
+        }
+        // checks if above the fifth of the chord and the interval is less than a minor 6th
+        if (aboveFifth && (noteMap.get(noteName) - noteMap.get(rootName)) % 11 < 8) {
+            finalNum += 1;
+        }
+        return noteName +'' + finalNum
+    }
+
+    // function for playing each chord
     function playChord(notes) {
         var ac = new AudioContext()
         console.log("in play chords")
@@ -114,10 +148,11 @@ export const LivePerformanceTool = (props) => {
                 //do nothing
             }
             else {
-                notes.forEach(element =>
-                {
-                    instrument.play(element + '4', ac.currentTime, { duration: chordLength * (60/tempo)})
-                })
+                var rootNote = notes[0]
+                
+                for (let i = 0; i < notes.length; i++) {
+                    instrument.play(findOctave(notes[i], rootNote, 4, i > 2), ac.currentTime, { duration: chordLength * (60/tempo)})
+                }
             }
           })
     }
