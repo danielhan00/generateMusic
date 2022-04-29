@@ -198,5 +198,6 @@ export {
   parseBars,
   getFirstChannel,
   getNoteData,
-  noteDictionary
+  noteDictionary,
+  exportMidi
 }
