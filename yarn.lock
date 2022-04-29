@@ -304,6 +304,13 @@
   dependencies:
     "js-tokens" "^3.0.0 || ^4.0.0"
 
+"midi-writer-js@^2.1.0":
+  "integrity" "sha512-VD/n4RnGAWy1oN66AGf5zvMi4/UXxvTCJcnLLu9M5zsHTOeUybbnGli70bnawWEZUJFnGiCeTDEGzLB7bClzEg=="
+  "resolved" "https://registry.npmjs.org/midi-writer-js/-/midi-writer-js-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "tonal-midi" "^0.69.7"
+
 "midimessage@^1.0.5":
   "integrity" "sha1-rZnwTYY6BTolY9VTxb81BwtIgCw="
   "resolved" "https://registry.npmjs.org/midimessage/-/midimessage-1.0.5.tgz"
@@ -314,7 +321,7 @@
   "resolved" "https://registry.npmjs.org/note-parser/-/note-parser-1.1.0.tgz"
   "version" "1.1.0"
 
-"note-parser@^2.0.0":
+"note-parser@^2.0.0", "note-parser@^2.0.1":
   "integrity" "sha1-JDj9V6RolLQCs6IHF5hmASnI+8E="
   "resolved" "https://registry.npmjs.org/note-parser/-/note-parser-2.0.1.tgz"
   "version" "2.0.1"
@@ -421,6 +428,13 @@
   "integrity" "sha1-3F5pjL0HkmW8c+A3doGk5Og/YW4="
   "resolved" "https://registry.npmjs.org/to-fast-properties/-/to-fast-properties-2.0.0.tgz"
   "version" "2.0.0"
+
+"tonal-midi@^0.69.7":
+  "integrity" "sha1-51Tsk/Pb2yim051CRXwzrSRf+kc="
+  "resolved" "https://registry.npmjs.org/tonal-midi/-/tonal-midi-0.69.7.tgz"
+  "version" "0.69.7"
+  dependencies:
+    "note-parser" "^2.0.1"
 
 "yaml@^1.7.2":
   "integrity" "sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg=="

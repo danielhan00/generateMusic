@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { parseBars, getFirstChannel, getNoteData,noteDictionary} from "../../midiparser-backend";
+import { parseBars, getFirstChannel, getNoteData,noteDictionary} from "../../midiparser-backend/midiUtility";
 import './MidiInput.css';
 import PianoRoll from "react-piano-roll";
 import { FilePicker } from "../reusable/FilePicker/FilePicker";

@@ -3,6 +3,7 @@ const { Pcset, Tonal } = require('@tonaljs/tonal')
 const MidiConvert = require('midiconvert')
 const { Progression } = require('@tonaljs/tonal')
 const { Midi, Key, Scale } = require('@tonaljs/tonal')
+const MidiWriter = require('midi-writer-js')
 
 //sample data for testing
 var key = 'C'
@@ -64,7 +65,10 @@ function parseBars(noteArray, duration) {
   let currBar = []
 
   for (var i = 0; i < noteArray.length; i++) {
-    if (noteArray[i].time < barDuration && !withinRange(noteArray[i].time,barDuration,.0001)) {
+    if (
+      noteArray[i].time < barDuration &&
+      !withinRange(noteArray[i].time, barDuration, 0.0001)
+    ) {
       currBar.push(noteArray[i])
       if (noteArray[i].time + noteArray[i].duration > barDuration) {
         dict[bar] = currBar
@@ -136,7 +140,7 @@ function beatHelper(meausureDuration, noteDuration) {
 
 function nearest16th(measureDuration, startTime) {
   let timeStamps = getTimeStamps(measureDuration)
- 
+
   let index = timeStamps.indexOf(findClosest(startTime, timeStamps))
   console.log(startTime, index, findClosest(startTime, timeStamps))
 
@@ -158,8 +162,8 @@ function getNoteData(duration, bars) {
   for (var i = 0; i < bars.length; i++) {
     for (var j = 0; j < bars[i].length; j++) {
       let sixteenth = nearest16th(duration, bars[i][j].time % duration)
-      let quarter = Math.floor(sixteenth / 4)%4
-      let remainder = sixteenth%4
+      let quarter = Math.floor(sixteenth / 4) % 4
+      let remainder = sixteenth % 4
 
       let timeString = '' + i + ':' + quarter + ':' + remainder
       noteData.push([
@@ -170,6 +174,34 @@ function getNoteData(duration, bars) {
     }
   }
   return noteData
+}
+
+function exportMidi(chords, tempo) {
+  const track = new MidiWriter.Track()
+  track.setTempo(tempo)
+  // Define an instrument (optional):
+  track.addEvent(new MidiWriter.ProgramChangeEvent({ instrument: 1 }))
+  // Add some notes:
+
+  for (chord of chords) {
+    note = new MidiWriter.NoteEvent({
+      pitch: chord,
+      duration: '1',
+    })
+    track.addEvent(note)
+  }
+
+  // Write to a new MIDI file.  it should match the original
+  const write = new MidiWriter.Writer(track);
+
+  fs = require('fs')
+try {
+  fs.writeFileSync('try.mid', write.buildFile())
+  //file written successfully
+} catch (err) {
+  console.error(err)
+}
+  console.log(write.dataUri())
 }
 
 function findClosest(target, array) {
@@ -199,3 +231,9 @@ console.log(readMidi('midiparser_backend/hardmid.mid'))
 console.log(Progression.toRomanNumerals('D', ['D']))
 console.log([1, 2, 3, 5, 6, 7].slice(0, 3))
 console.log([1, 2, 3, 5, 6, 7].slice(3, 6))
+
+exportMidi([
+  ['A4', 'C4', 'E4'],
+  ['B4', 'D4', 'F4'],
+  ['C4', 'E4', 'G4'],
+], 80)

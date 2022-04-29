@@ -15,6 +15,7 @@
     "fs": "^0.0.1-security",
     "jquery": "^3.6.0",
     "midi-parser-js": "^4.0.4",
+    "midi-writer-js": "^2.1.0",
     "midiconvert": "^0.4.7",
     "midicube": "^0.6.1",
     "popper.js": "^1.16.1",
