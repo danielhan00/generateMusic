@@ -4,6 +4,8 @@ import './MidiInput.css';
 import PianoRoll from "react-piano-roll";
 import { FilePicker } from "../reusable/FilePicker/FilePicker";
 import { LocalStoragePicker } from "../reusable/LocalStoragePicker/LocalStoragePicker";
+import { AButton } from '../reusable/AButton/AButton'
+import { Button } from 'react-bootstrap';
 const MidiConvert = require('midiconvert')
 
 
@@ -98,6 +100,7 @@ export const MidiInput = (props) => {
     } else {
       setPianoRoll(null)
     }
+    //props.setChordNotes(midiFile.chords)
     setPianoRoll(pRoll);
   }, [props.isLoading,]);
 
@@ -131,6 +134,7 @@ export const MidiInput = (props) => {
 
     //sets the notes for the piano roll
     setNotes(midi.notes);
+    //props.setChordNotes(midi.chords)
   }
 
 
@@ -157,6 +161,8 @@ export const MidiInput = (props) => {
         <td><FilePicker f={updateContent} currFile={currFile} currFileChange={setCurrFile} file={file} midiChange={setFile}></FilePicker></td>
         <td><LocalStoragePicker f={updateContent} currFile={currFile} currFileChange={setCurrFile}></LocalStoragePicker></td>
         <td>{currFile}</td>
+        <td style={{width: "1024px"}}>&nbsp;</td>
+        <td><Button className='upload-btn' variant="secondary" disabled={props.isLoading} onClick={() =>props.saveFile()}>Export Chord Midi</Button></td>
         </tr>
       </table>
     {pianoRoll}
@@ -173,6 +179,7 @@ function uploadMidi(content) {
  
   //parses binary string into a Midi JSON
   var midi = MidiConvert.parse(content);
+  console.log(midi);
  
 
   //getting the midi data

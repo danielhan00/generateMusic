@@ -180,8 +180,8 @@ function exportMidi(chords, tempo, timeSignature) {
   track.addEvent(new MidiWriter.ProgramChangeEvent({ instrument: 1 }))
   // Add some notes:
 
-  for (chord of chords) {
-    note = new MidiWriter.NoteEvent({
+  for (let chord of chords) {
+    let note = new MidiWriter.NoteEvent({
       pitch: chord,
       duration: '1',
     })

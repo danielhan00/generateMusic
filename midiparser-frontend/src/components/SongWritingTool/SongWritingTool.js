@@ -2,6 +2,8 @@ import React, {useState, useEffect} from "react";
 import { TransportBar } from "../TransportBar/TransportBar";
 import { MidiInput } from "../MidiInput/MidiInput";
 import { SuggestionBar } from "../SuggestionBar/SuggestionBar";
+import { exportMidi } from "../../midiparser-backend/midiUtility";
+import { saveAs } from 'file-saver'
 import axios from "axios";
 import Soundfont from 'soundfont-player'
 import './SongWritingTool.css'
@@ -31,6 +33,7 @@ export const SongWritingTool =(props)=>{
     const [chordNum, setChordNum] = useState(0);
     const [chords, setChords] = useState([]);
     const [chordNotes, setChordNotes] = useState([]);
+    const [octaveChords, setOctaveChords] = useState([])
     const [updateChords, setUpdateChords] = useState(0);
     const [isLoading, setLoading] = useState(true);
     const [notesByMeasure, setNotesByMeasure] = useState([]);
@@ -85,7 +88,7 @@ export const SongWritingTool =(props)=>{
             //individual play functions
             //playChord(chordNotes[measure]);
             //playMeasure(notesByMeasure[measure])
-            playMidi(chordNotes[measure],notesByMeasure[measure])
+            playMidi(octaveChords[measure],notesByMeasure[measure])
         }
     }
 
@@ -102,6 +105,30 @@ export const SongWritingTool =(props)=>{
         else if (accom === 'Synth') setChordSound('synth_brass_1')
         else if (accom === 'Vibraphone') setChordSound('vibraphone')
         else if (accom === 'None') setChordSound('none')
+    }
+
+    //to set the chords with their respective octave numbers
+    useEffect(() => {
+        let octaveChords = []
+        for (let chord of chordNotes) {
+            let numChord = []
+            var rootNote = chord[0]
+            for (let i = 0; i < chord.length; i++) {
+                let note = findOctave(chord[i], rootNote, 3, i > 2)
+                numChord.push(note);
+            }
+            octaveChords.push(numChord)
+        }
+        setOctaveChords(octaveChords);
+    }, [chordNotes])
+
+    /**
+     * Saves the chord midi file to be downloaded
+     */
+    function exportChordMidi() {
+        let blob = new Blob([exportMidi(octaveChords, tempo, [beatsPerMeasure, timeSigDenom])]) 
+        let file = new File([blob], "downloaded_midi.mid");
+        saveAs(file);
     }
 
     // constant for finding octave relation of notes
@@ -210,7 +237,7 @@ export const SongWritingTool =(props)=>{
                 //melody
                 instrument.schedule(ac.currentTime ,note)
                     chordNotes.forEach(element => {
-                        instrument.play(element + '4', ac.currentTime, { duration: beatsPerMeasure * (60 / tempo) })
+                        instrument.play(element, ac.currentTime, { duration: beatsPerMeasure * (60 / tempo) })
                     }) 
             }
         })
@@ -235,7 +262,7 @@ export const SongWritingTool =(props)=>{
     return <div className="SWContainer">
         <MidiInput  tempo={tempo} setTempo={setTempo} timeSigNum={beatsPerMeasure} setTimeSigNum={setBeatsPerMeasure} setTimeSigDenom={setTimeSigDenom} timeSigDenom={timeSigDenom}
             melody={melody} setMelody={setMelody} chordNum={chordNum} setChordNum={setChordNum} updateChords={updateChords} setUpdateChords={setUpdateChords}
-            chordNotes={chordNotes}  isLoading={isLoading} notesByMeasure={notesByMeasure} setNotesByMeasure={setNotesByMeasure}
+            chordNotes={chordNotes}  isLoading={isLoading} notesByMeasure={notesByMeasure} setNotesByMeasure={setNotesByMeasure} saveFile={exportChordMidi}
         ></MidiInput>
         <SuggestionBar togglePlay={toggle} measures={chordNum} chords={chords} setChords={setChords} isLoading={isLoading} />
        <TransportBar playing={isActive || isLoading} genre={genre} genreOptions={genreMessage.data.genreOptions} genreChangeClick={setGenre} accompaniment={chordSoundName} setAccompaniment={changeAccompaniment}
