@@ -420,19 +420,22 @@ class secondOrderMarkovChain():
         all_next_stat = list(possibility_chart.keys())
         all_next_stat_possibility = list(possibility_chart.values())
 
-        # Randomly select one status
-        rand = random.random()
-        get_stat_attempt = 0
-        need_escape = False;
-        attempt = 0;
-        while (rand > 0) and (not need_escape):
-            attempt = attempt + 1
-            if attempt > len(self._markov_chain_table.keys()):
-                need_escape = True
-            rand = rand - all_next_stat_possibility[get_stat_attempt]
-            get_stat_attempt = get_stat_attempt + 1
+        possibility_sum = 0
+        for one_possibility in all_next_stat_possibility:
+            possibility_sum = possibility_sum + one_possibility
 
-        if not need_escape:
+        if possibility_sum != 0:
+            # Randomly select one status
+            rand = random.random() * possibility_sum
+            print(rand)
+            print('----')
+            for g in all_next_stat_possibility:
+                print(g)
+
+            get_stat_attempt = 0
+            while rand > 0:
+                rand = rand - all_next_stat_possibility[get_stat_attempt]
+                get_stat_attempt = get_stat_attempt + 1
             result = all_next_stat[get_stat_attempt - 1]
         else:
             dice = random.random() * 6
@@ -460,7 +463,7 @@ class secondOrderMarkovChain():
                     result = status('VI')
 
         return result
-
+    
     # TRY TO RESOLVE A CHORD BASED ON THE PREVIOUS CHORD
     def resolve_one_chord_base_on_prev(self, prev_stat: status) -> status:
         rand = (random.random()) * 4.0
