@@ -1,37 +1,11 @@
 const { detect } = require('@tonaljs/chord-detect')
-const { Pcset, Tonal } = require('@tonaljs/tonal')
+const { Pcset, Tonal, TimeSignature } = require('@tonaljs/tonal')
 const MidiConvert = require('midiconvert')
 const { Progression } = require('@tonaljs/tonal')
 //const { Midi, Key, Scale } = require('@tonaljs/tonal')
 const { Midi, Key, Scale } = require('@tonaljs/tonal')
+const MidiWriter = require('midi-writer-js')
 
-//sample data for testing
-var key = 'C'
-var mode = 'Major'
-var genre = 'Rock'
-
-/*
-let fs = require('fs')
-function readMidi(fileName) {
-  fs.readFile(fileName, 'binary', function (err, midiBlob) {
-    if (!err) {
-      let midi = MidiConvert.parse(midiBlob)
-      let notes = getFirstChannel(midi.tracks)
-      let bpm = midi.header.bpm
-      let timeSignature = midi.header.timeSignature
-      let meausureDuration = (240 / bpm) * (timeSignature[0] / timeSignature[1])
-      let bars = parseBars(notes, meausureDuration)
-      let notesInBar = noteDictionary(bars)
-      console.log(meausureDuration)
-      //console.log(numberToNoteNames(notes))
-
-      return midiInfo
-    } else {
-      console.log('error')
-    }
-  })
-}
-*/
 // returns array of notes in given key
 function notesInKey(key) {
   return Scale.get(key).notes
@@ -44,8 +18,6 @@ function numberToNoteNames(noteArray) {
     const noteName = Midi.midiToNoteName(noteArray[i].midi)
     notes.push(noteName)
   }
-  //console.log(notes)
-  //console.log(detect(notes))
   return notes
 }
 
@@ -56,8 +28,6 @@ function justPitches(noteArray) {
     noteName = noteName.replace(/[0-9]/g, '')
     notes.push(noteName)
   }
-  //console.log(notes)
-  //console.log(detect(notes))
   return notes
 }
 
@@ -66,7 +36,6 @@ function noteDictionary(bars) {
   let dict = []
   for (const [key, value] of Object.entries(bars)) {
     dict[key] = justPitches(value)
-    //console.log(key, dict[key])
   }
   return dict
 }
@@ -105,13 +74,11 @@ function parseBars(noteArray, duration) {
 function getChords(key, mode) {
   if (mode.toLowerCase() == 'major') {
     let chords = Key.majorKey(key).chords
-    //console.log('major', chords)
     return chords
   }
   //minor function not working
   if (mode.toLowerCase() == 'minor') {
     let minorChords = Key.minorKey('C').chords
-    //console.log('minor', minorChords)
     return minorChords
   }
 }
@@ -205,32 +172,28 @@ function withinRange(input1, input2, deviation) {
   return Math.abs(input1 - input2) <= deviation
 }
 
-//const file = fs.createReadStream('midiparser-backend/Chords.csv')
-/*
-var csvData = []
-Papa.parse(file, {
-  header: true,
-  step: function (result) {
-    csvData.push(result.data)
-  },
-  complete: function (results, file) {
-    console.log('Complete', csvData.length, 'records.')
-    for (var i = 0; i < csvData.length; i++) {
-      let chords = csvData[i].chords.split(',')
-      let tonality = csvData[i].tonality
-      if (tonality != '') {
-        //console.log(tonality, chords)
-        console.log(tonality, Progression.toRomanNumerals(tonality, chords))
-      }
-    }
-  },
-})
+function exportMidi(chords, tempo, timeSignature) {
+  const track = new MidiWriter.Track()
+  track.setTempo(tempo)
+  track.setTimeSignature(timeSignature[0], timeSignature[1])
+  // Define an instrument (optional):
+  track.addEvent(new MidiWriter.ProgramChangeEvent({ instrument: 1 }))
+  // Add some notes:
 
-getChords(key, mode)
-//console.log(readMidi('testmid.mid'))
+  for (chord of chords) {
+    note = new MidiWriter.NoteEvent({
+      pitch: chord,
+      duration: '1',
+    })
+    track.addEvent(note)
+  }
 
-console.log(Progression.toRomanNumerals('D', ['D']))
-*/
+  // Write to a new MIDI file.  it should match the original
+  const write = new MidiWriter.Writer(track)
+  return write.buildFile()
+}
+
+
 export {
   parseBars,
   getFirstChannel,

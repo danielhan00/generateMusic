@@ -2628,8 +2628,6 @@
   "resolved" "https://registry.npmjs.org/binary-extensions/-/binary-extensions-2.2.0.tgz"
   "version" "2.2.0"
 
-<<<<<<< HEAD
-=======
 "bindings@^1.5.0":
   "integrity" "sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ=="
   "resolved" "https://registry.npmjs.org/bindings/-/bindings-1.5.0.tgz"
@@ -2637,7 +2635,6 @@
   dependencies:
     "file-uri-to-path" "1.0.0"
 
->>>>>>> 3dcdb825fc6d3408e22e97415b2b6c8406bae211
 "bluebird@^3.5.1", "bluebird@^3.5.5":
   "integrity" "sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg=="
   "resolved" "https://registry.npmjs.org/bluebird/-/bluebird-3.7.2.tgz"
@@ -5054,14 +5051,11 @@
     "loader-utils" "^1.0.2"
     "schema-utils" "^1.0.0"
 
-<<<<<<< HEAD
-=======
 "file-uri-to-path@1.0.0":
   "integrity" "sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw=="
   "resolved" "https://registry.npmjs.org/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz"
   "version" "1.0.0"
 
->>>>>>> 3dcdb825fc6d3408e22e97415b2b6c8406bae211
 "filename-regex@^2.0.0":
   "integrity" "sha1-wcS5vuPglyXdsQa3XB4wH+LxiyY="
   "resolved" "https://registry.npmjs.org/filename-regex/-/filename-regex-2.0.1.tgz"
@@ -5346,8 +5340,6 @@
   "resolved" "https://registry.npmjs.org/fs/-/fs-0.0.1-security.tgz"
   "version" "0.0.1-security"
 
-<<<<<<< HEAD
-=======
 "fsevents@^1.2.7":
   "integrity" "sha512-oWb1Z6mkHIskLzEJ/XWX0srkpkTQ7vaopMQkyaEIoq0fmtFVxOthb8cCxeT+p3ynTdkk/RZwbgG4brR5BeWECw=="
   "resolved" "https://registry.npmjs.org/fsevents/-/fsevents-1.2.13.tgz"
@@ -5361,7 +5353,6 @@
   "resolved" "https://registry.npmjs.org/fsevents/-/fsevents-2.3.2.tgz"
   "version" "2.3.2"
 
->>>>>>> 3dcdb825fc6d3408e22e97415b2b6c8406bae211
 "function-bind@^1.1.1":
   "integrity" "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A=="
   "resolved" "https://registry.npmjs.org/function-bind/-/function-bind-1.1.1.tgz"
@@ -7663,6 +7654,13 @@
   "resolved" "https://registry.npmjs.org/midi-parser-js/-/midi-parser-js-4.0.4.tgz"
   "version" "4.0.4"
 
+"midi-writer-js@^2.1.0":
+  "integrity" "sha512-VD/n4RnGAWy1oN66AGf5zvMi4/UXxvTCJcnLLu9M5zsHTOeUybbnGli70bnawWEZUJFnGiCeTDEGzLB7bClzEg=="
+  "resolved" "https://registry.npmjs.org/midi-writer-js/-/midi-writer-js-2.1.0.tgz"
+  "version" "2.1.0"
+  dependencies:
+    "tonal-midi" "^0.69.7"
+
 "midiconvert@^0.4.7":
   "integrity" "sha512-GfzIQDY7Msml5HEcQjoVMbeyEsDRlkzkZ5IVJ6rxfAs4df3Ux6pJRIXT010gbQ3hI10aX16h716XoVkC+V+szw=="
   "resolved" "https://registry.npmjs.org/midiconvert/-/midiconvert-0.4.7.tgz"
@@ -7866,14 +7864,11 @@
   "resolved" "https://registry.npmjs.org/mute-stream/-/mute-stream-0.0.7.tgz"
   "version" "0.0.7"
 
-<<<<<<< HEAD
-=======
 "nan@^2.12.1":
   "integrity" "sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ=="
   "resolved" "https://registry.npmjs.org/nan/-/nan-2.15.0.tgz"
   "version" "2.15.0"
 
->>>>>>> 3dcdb825fc6d3408e22e97415b2b6c8406bae211
 "nanomatch@^1.2.9":
   "integrity" "sha512-fpoe2T0RbHwBTBUOftAfBPaDEi06ufaUai0mE6Yn1kacc3SnTErfb/h+X94VXzI64rKFHYImXSvdwGGCmwOqCA=="
   "resolved" "https://registry.npmjs.org/nanomatch/-/nanomatch-1.2.13.tgz"
@@ -8021,6 +8016,11 @@
   "integrity" "sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg=="
   "resolved" "https://registry.npmjs.org/normalize-url/-/normalize-url-3.3.0.tgz"
   "version" "3.3.0"
+
+"note-parser@^2.0.1":
+  "integrity" "sha1-JDj9V6RolLQCs6IHF5hmASnI+8E="
+  "resolved" "https://registry.npmjs.org/note-parser/-/note-parser-2.0.1.tgz"
+  "version" "2.0.1"
 
 "notecoord@^1.0.1":
   "integrity" "sha1-icQqt7tXlqKfPH+t6YJcUJ2PHtE="
@@ -11200,6 +11200,13 @@
   "integrity" "sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA=="
   "resolved" "https://registry.npmjs.org/toidentifier/-/toidentifier-1.0.1.tgz"
   "version" "1.0.1"
+
+"tonal-midi@^0.69.7":
+  "integrity" "sha1-51Tsk/Pb2yim051CRXwzrSRf+kc="
+  "resolved" "https://registry.npmjs.org/tonal-midi/-/tonal-midi-0.69.7.tgz"
+  "version" "0.69.7"
+  dependencies:
+    "note-parser" "^2.0.1"
 
 "topo@2.x.x":
   "integrity" "sha1-zVYVdSU5BXwNwEkaYhw7xvvh0YI="
