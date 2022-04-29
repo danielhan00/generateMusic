@@ -1,56 +1,73 @@
 import React, { useEffect, useRef, useState } from "react";
-import { parseBars, getFirstChannel, getNoteData, orderData,noteDictionary} from "../../midiparser-backend";
+import { parseBars, getFirstChannel, getNoteData,noteDictionary} from "../../midiparser-backend";
 import './MidiInput.css';
 import PianoRoll from "react-piano-roll";
 import { FilePicker } from "../reusable/FilePicker/FilePicker";
-
 import { LocalStoragePicker } from "../reusable/LocalStoragePicker/LocalStoragePicker";
-//import * as MIDI from 'midicube';
 const MidiConvert = require('midiconvert')
 
 
 
 
-
+//global for handling the midi data
 let midiFile = {
   bpm: 120,
   measures: 0,
   timeSig: [4, 4],
   notes: [],
+  chords: [],
   parsedBars: [],
+  midi: {}
 }
 
 
-
+/**
+ * MidiInput is the main component of the Songwriting tool. The piano roll and the file pickers are housed here.
+ */
 export const MidiInput = (props) => {
+
+  //data from the midi file
   const [bpm, setBPM] = useState(null)
   const [measures, setMeasures] = useState(null);
   const [timeSig, setTimeSig] = useState(null);
   const [notes, setNotes] = useState(null);
   const [content, setContent] = useState("");
-  const [pianoRoll, setPianoRoll] = useState();
+
+  //the PianoRoll object
+  const [pianoRoll, setPianoRoll] = useState(null);
+
+  //file handlers
   const [currFile, setCurrFile] = useState("No file selected");
   const [file, setFile] = useState(null);
 
-
-  const playbackRef = useRef();
-
   
-
+  /**
+   * Takes in midi content from the file (either file upload or local storage) and sets the content. 
+   * This function also passes the content to a helper to be parsed.
+   * @param {string} content 
+   */
   function updateContent(content) {
       setPianoRoll();
       setContent(content);
-      uploadMidi(content);
-      
+      uploadMidi(content); 
   }
 
+  //takes values from the global and updates the midi states when a new file is uploaded
   useEffect(() => {
     updateMidi(midiFile);
-
-    //loadMidi(file);
   }, [content]);
 
-  useEffect(() => {
+
+/**
+ * Funciton to set the piano roll. If chords is false, only the melody notes will appear on 
+ * the piano roll. If it is true, the melody and the chords will appear on the piano roll.
+ * 
+ * @param {boolean} chords 
+ * @returns PianoRoll component
+ */
+  function updatePianoRoll(chords) {
+    let pianoNotes = chords ? midiFile.notes.concat(midiFile.chords) : midiFile.notes;
+    setPianoRoll(null);
     let pianoRoll = <PianoRoll
       width={1620}
       height={500}
@@ -61,75 +78,79 @@ export const MidiInput = (props) => {
       gridLineColor={0x333333}
       blackGridBgColor={0x1e1e1e}
       whiteGridBgColor={0x282828}
-      ref={playbackRef}
       time={props.time}
       noteFormat={"String"}
-      noteData={midiFile.notes}
+      noteData={pianoNotes}
     />
-    setPianoRoll(pianoRoll);
-    console.log(midiFile);
-  }, [content])
+
+    return pianoRoll
+  }
+
+// in charge of setting the piano roll
+  useEffect(() => {
+    setPianoRoll(null)
+    let pRoll;
+    if (props.chordNotes !== undefined && props.chordNotes.length !== 0 && !props.isLoading) {
+      addChords(midiFile)
+      pRoll = updatePianoRoll(true);
+    } else if (pianoRoll === null) {
+      pRoll = updatePianoRoll(false); 
+    } else {
+      setPianoRoll(null)
+    }
+    setPianoRoll(pRoll);
+  }, [props.isLoading,]);
 
 
+  /**
+   * Function that passes in the gloabl midiFile to the set states. From here, props from the main 
+   * Songwriting Tool Component are also updated. The api gets triggered by this call
+   * @param {midiFile} midi 
+   */
   function updateMidi(midi) {
+
+    //bpm/tempo
     setBPM(midi.bpm);
-    console.log("midi.bpm:" + midi.bpm);
     props.setTempo(midi.bpm);
+
+    //number of measures
     setMeasures(midi.measures);
     props.setChordNum(midi.measures);
+
+    //time signatures
     setTimeSig(midi.timeSig);
     props.setTimeSigNum(midi.timeSig[0]);
     props.setTimeSigDenom(midi.timeSig[1]);
 
+    //melody and notes by measure
     props.setMelody(midi.parsedBars);
-    props.setUpdateChords(props.updateChords + 1);
-    
-    setNotes(midi.notes);
-    //setFile(file);
+    props.setNotesByMeasure(midi.midi);
 
+    //calls the api to generate new chords
+    props.setUpdateChords(props.updateChords + 1);
+
+    //sets the notes for the piano roll
+    setNotes(midi.notes);
   }
 
-  // var Player = new MidiPlayer.Player(function (event) {
-  //   console.log(event);
-  // });
 
-  
-  let currentTime = 0;
-
-
-  useEffect(() => {
-    window.addEventListener("keydown", ({ key }) => {
-
-    console.log(playbackRef);
-      console.log(playbackRef.current);
-      // console.log("end: " + player.endTime)
-      // console.log(player.currentTime)
-      // console.log(player)
-      // currentTime = player.currentTime
-    //console.log("transport time: " + playbackRef.transportTime);
-    //console.log("piano roll time? " + pianoRoll.props.time);
- 
-      // if (player.currentTime === player.endTime) {
-      //   //player.stop()
-      //   playbackRef.current.seek();
-      // }
-      if (key === " ") {
-        playbackRef.current.toggle()
-        //midiControls("start");
-        //toggle(false);
-    } else if (key === "Enter") {
-      playbackRef.current.seek("0:0:0");
-      //midiControls("stop")
-        //player.stop();
-      
+/**
+ * Helper function to add the generated chords to the piano roll
+ * @param {midiFile} midi 
+ */
+  function addChords(midi) {
+    midi.chords = [];
+    if (props.chordNotes !== undefined && props.chordNotes.length !== 0) {
+      for (let i = 0; i < props.chordNotes.length; i++) {
+        for (let j = 0; j < props.chordNotes[i].length; j++) {
+          let note = [`${i}:0:0`, props.chordNotes[i][j] + 3, "1n"]
+          midi.chords.push(note);
+        }
       }
-  });
-    
-}, [playbackRef.current])
-  
+    }
+  }
 
 
-  
   return <div className="MidiInput">
     <table className="MidiContentUpload">
       <tr>
@@ -139,91 +160,34 @@ export const MidiInput = (props) => {
         </tr>
       </table>
     {pianoRoll}
-    
-
       
     </div>
 }
 
-
-/* function loadMidi(file) {
-  console.log("file", file);
-  console.log(MIDI.Player)
-  console.log(MIDI);
-  MIDI.loadPlugin({
-    soundfontUrl: "./soundfont/",
-    onsuccess:
-      () => {
-        player = new MIDI.Player()
-        player.timeWarp = 1;
-        if (file != null) {
-          player.loadFile(file
-, () => {
-  console.log("file loaded!")
-            player.start();
-            }, undefined , err => {console.warn(err)})
-          }
-        console.log("success!")
-      }
-  }
-)
-
-}
-
-var toggle = function(stop) {
-  if (stop) {
-    player.stop();
-  } else if (MIDI.Player.playing) {
-    player.pause(true);
-  } else {
-    player.resume();
-  }
-}; */
-
+/**
+ * Parses the binary string and updates the global midiFile.
+ * @param {string} content 
+ * @returns 
+ */
 function uploadMidi(content) {
-  console.log(content);
+ 
+  //parses binary string into a Midi JSON
   var midi = MidiConvert.parse(content);
-  console.log(midi);
+ 
+
+  //getting the midi data
   const timeSig = midi.header.timeSignature;
-  //setBPM(timeSig);
   const bpm = midi.header.bpm;
-  //setTimeSig(bpm);
   const notes = getFirstChannel(midi.tracks);
-  console.log("time Sig: " + timeSig);
-  console.log("bpm: " + bpm);
   const measureDuration = (240 / bpm) * (timeSig[0] / timeSig[1]);
   const parsedBars = parseBars(notes, measureDuration);
-  console.log("note data: " + getNoteData(measureDuration, parseBars(notes, measureDuration)));
+ 
+  //setting the midi data
   midiFile.notes = getNoteData(measureDuration, parsedBars);
-
-  //transportHelp(bpm, timeSig[0], notes[1].time);
-  console.log(parseBars(notes, measureDuration));
-  //setMeasures(Object.keys(parseBars(notes, meausureDuration)).length);
-  //console.log(readMidi(content));
   midiFile.bpm = bpm;
   midiFile.timeSig = timeSig;
   midiFile.measures = Object.keys(parsedBars).length;
-  //console.log("num measures" + parseBars(notes, measureDuration))
   midiFile.parsedBars = noteDictionary(parsedBars)
-  
-  
-  console.log(midiFile[bpm]);
-  return {
-    bpm: bpm,
-    timeSig: timeSig,
-    measures: Object.keys(parseBars(notes, measureDuration)).length,
-    parsedBars: parseBars(notes, measureDuration)
-  }
-  
+  midiFile.midi = parsedBars;
+
 }
-
-/*
-TO:DO
--play audio
--adding chords to piano roll
-  -see lowest note if chord midi number is above -12
--export chords midi
-
-
-
-*/

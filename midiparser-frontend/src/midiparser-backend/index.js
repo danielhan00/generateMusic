@@ -187,22 +187,6 @@ function getNoteData(duration, bars) {
   return noteData
 }
 
-function orderData(noteArray, measureNum) {
-  let measures = [];
-
-  for (let j = 0; j < measureNum; j++){
-    let measure = []
-    for (let k = 0; k < noteArray.length; k++){
-      let note = noteArray[k];
-      let m = parseInt(note[0].split(":")[0])
-      if (m === j) {
-        measure.push(noteArray[k]);
-      }
-    }
-    measures.push(measure);
-  }
-  return measures;
-}
 
 function findClosest(target, array) {
   return array.reduce((a, b) => {
@@ -251,6 +235,5 @@ export {
   parseBars,
   getFirstChannel,
   getNoteData,
-  orderData,
   noteDictionary
 }

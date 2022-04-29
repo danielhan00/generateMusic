@@ -3,6 +3,7 @@
     "@babel/runtime": "^7.17.9",
     "@emotion/core": "^10.1.1",
     "flask": "^0.2.10",
-    "react-pure-loaders": "^3.0.1"
+    "react-pure-loaders": "^3.0.1",
+    "soundfont-player": "^0.12.0"
   }
 }
