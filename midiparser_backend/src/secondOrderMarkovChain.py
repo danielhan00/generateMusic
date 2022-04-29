@@ -4,7 +4,7 @@
 import imp
 from typing import Any, Dict, List
 from midiparser_backend.src.status import Any, status
-from midiparser_backend.src.markovUtility import validateChords
+from midiparser_backend.src.markovUtility import Any, validateChords
 #from Markov_Chain.status import Any, status
 import random
 
@@ -256,7 +256,7 @@ class secondOrderMarkovChain():
                 # Calculate the possibility for each transition
                 for next_status in this_prev_stat_table_happen_time.keys():
                     if this_prev_stat_all_happening == 0:
-                        possibility = 1 / len(self._all_status)
+                        possibility = 0
                     else:
                         possibility = this_prev_stat_table_happen_time.get(next_status) / this_prev_stat_all_happening
                     this_prev_stat_table[next_status] = possibility
@@ -299,7 +299,6 @@ class secondOrderMarkovChain():
         result = []
 
         direct_possibility_chart = {}
-        direct_popped_possibility_sum = 0
         for next_stat_to_spit in self._markov_chain_table.keys():
             average_possibility = 0.0
             factor = 0.0
@@ -311,25 +310,15 @@ class secondOrderMarkovChain():
                     factor = factor + 1.0
             average_possibility = average_possibility / factor
             direct_possibility_chart[next_stat_to_spit] = average_possibility
-        keys_to_remove = []
-        for one_key in direct_possibility_chart.keys():
-            if direct_possibility_chart.get(one_key) < (1.0 / len(direct_possibility_chart.keys())):
-                keys_to_remove.append(one_key)
-                one_popped_off_possibility = direct_possibility_chart.get(one_key)
-                direct_popped_possibility_sum = direct_popped_possibility_sum + one_popped_off_possibility
-        for one_key_to_remove in keys_to_remove:
-            direct_possibility_chart.pop(one_key_to_remove)
 
         # generate first chord
         first_chord \
-            = self.generate_one_chord_and_evaluate(1, direct_possibility_chart, has_melody, key, mode, melody_notes[0],
-                                                   direct_popped_possibility_sum)
+            = self.generate_one_chord_and_evaluate(1, direct_possibility_chart, has_melody, key, mode, melody_notes[0])
         self._running_prev_stat = first_chord
         result.append(first_chord.get_status_name())
 
         # Get the possibility chart for the second
         prev_possibility_chart = {}
-        prev_popped_possibility_sum = 0
         for next_stat_to_spit in self._markov_chain_table.keys():
             average_possibility = 0.0
             factor = 0.0
@@ -340,21 +329,13 @@ class secondOrderMarkovChain():
                 factor = factor + 1.0
             average_possibility = average_possibility / factor
             prev_possibility_chart[next_stat_to_spit] = average_possibility
-        keys_to_remove = []
-        for one_key in prev_possibility_chart.keys():
-            if prev_possibility_chart.get(one_key) < (1.0 / len(prev_possibility_chart.keys())):
-                keys_to_remove.append(one_key)
-                one_popped_off_possibility = prev_possibility_chart.get(one_key)
-                prev_popped_possibility_sum = prev_popped_possibility_sum + one_popped_off_possibility
-        for one_key_to_remove in keys_to_remove:
-            prev_possibility_chart.pop(one_key_to_remove)
 
         if num_chord >= 2:
             # One-step resolve
             if num_chord == 2:
                 second_and_last_chord \
                     = self.generate_one_chord_and_evaluate(2, prev_possibility_chart, has_melody, key, mode,
-                                                           melody_notes[1], prev_popped_possibility_sum)
+                                                           melody_notes[1])
                 self._running_prev_prev_stat = self._running_prev_stat
                 self._running_prev_stat = second_and_last_chord
                 result.append(second_and_last_chord.get_status_name())
@@ -368,28 +349,19 @@ class secondOrderMarkovChain():
                     if current_chord == 2:
                         second_chord \
                             = self.generate_one_chord_and_evaluate(1, prev_possibility_chart, has_melody, key, mode,
-                                                                   melody_notes[1], prev_popped_possibility_sum)
+                                                                   melody_notes[1])
                         self._running_prev_prev_stat = self._running_prev_stat
                         self._running_prev_stat = second_chord
                         result.append(second_chord.get_status_name())
 
                     # The rest is exactly the possibility in the 2nd-order markov chain
                     else:
-                        pnpp_popped_possibility_sum = 0
                         pnpp_possibility_chart = self._markov_chain_table.get(self._running_prev_prev_stat).get(
                             self._running_prev_stat)
-                        keys_to_remove = []
-                        for one_key in pnpp_possibility_chart.keys():
-                            if pnpp_possibility_chart.get(one_key) < (1.0 / len(pnpp_possibility_chart.keys())):
-                                one_popped_off_possibility = pnpp_possibility_chart.get(one_key)
-                                pnpp_popped_possibility_sum = pnpp_popped_possibility_sum + one_popped_off_possibility
-                        for one_key_to_remove in keys_to_remove:
-                            pnpp_possibility_chart.pop(one_key_to_remove)
 
                         new_chord \
                             = self.generate_one_chord_and_evaluate(1, pnpp_possibility_chart, has_melody, key, mode,
-                                                                   melody_notes[current_chord - 1],
-                                                                   pnpp_popped_possibility_sum)
+                                                                   melody_notes[current_chord - 1])
                         self._running_prev_prev_stat = self._running_prev_stat
                         self._running_prev_stat = new_chord
                         result.append(new_chord.get_status_name())
@@ -399,14 +371,14 @@ class secondOrderMarkovChain():
                 # two-step resolve
                 second_last_chord \
                     = self.generate_one_chord_and_evaluate(2, prev_possibility_chart, has_melody, key, mode,
-                                                           melody_notes[num_chord - 2], prev_popped_possibility_sum)
+                                                           melody_notes[num_chord - 2])
                 self._running_prev_prev_stat = self._running_prev_stat
                 self._running_prev_stat = second_last_chord
                 result.append(second_last_chord.get_status_name())
 
                 last_chord \
                     = self.generate_one_chord_and_evaluate(2, prev_possibility_chart, has_melody, key, mode,
-                                                           melody_notes[num_chord - 1], prev_popped_possibility_sum)
+                                                           melody_notes[num_chord - 1])
                 self._running_prev_prev_stat = self._running_prev_stat
                 self._running_prev_stat = last_chord
                 result.append(last_chord.get_status_name())
@@ -418,8 +390,7 @@ class secondOrderMarkovChain():
 
     # TO GENERATE ONE CHORD RECURSIVELY UNTIL IT IS ACCEPTED
     def generate_one_chord_and_evaluate(self, generate_type_flag: int, possibility_chart: Dict, has_melody: bool,
-                                        key: str, mode: str, measure_notes: List[str],
-                                        reduced_possibility_sum: float) -> status:
+                                        key: str, mode: str, measure_notes: List[str]) -> status:
         chord_accepted = False
         attempt = 0
         while (not chord_accepted) and (attempt < 30):
@@ -428,14 +399,13 @@ class secondOrderMarkovChain():
             # 1: generate
             # 2: resolve
             if generate_type_flag == 1:
-                new_chord = self.generated_one_chord(possibility_chart, reduced_possibility_sum)
+                new_chord = self.generated_one_chord(possibility_chart, mode)
             elif generate_type_flag == 2:
                 new_chord = self.resolve_one_chord_base_on_prev(self._running_prev_stat)
             else:
                 raise ValueError('Dude, pass in a 1 or 2 for the flag')
 
             new_chord_name = new_chord.get_status_name()
-            print(new_chord_name)
 
             if has_melody:
                 if validateChords(key, mode, new_chord_name, measure_notes):
@@ -446,17 +416,48 @@ class secondOrderMarkovChain():
         return new_chord
 
     # TO GENERATE ONE CHORD (NAME) REGARDLESS OF ANY PREV STATUS
-    def generated_one_chord(self, possibility_chart: Dict, popped_possibility_sum: float) -> status:
+    def generated_one_chord(self, possibility_chart: Dict, mode: str) -> status:
         all_next_stat = list(possibility_chart.keys())
         all_next_stat_possibility = list(possibility_chart.values())
 
         # Randomly select one status
-        rand = (random.random()) * (1 - popped_possibility_sum)
+        rand = random.random()
         get_stat_attempt = 0
-        while rand > 0:
+        need_escape = False;
+        attempt = 0;
+        while (rand > 0) and (not need_escape):
+            attempt = attempt + 1
+            if attempt > len(self._markov_chain_table.keys()):
+                need_escape = True
             rand = rand - all_next_stat_possibility[get_stat_attempt]
             get_stat_attempt = get_stat_attempt + 1
-        result = all_next_stat[get_stat_attempt - 1]
+
+        if not need_escape:
+            result = all_next_stat[get_stat_attempt - 1]
+        else:
+            dice = random.random() * 6
+            if dice < 2.0:
+                if mode.__contains__('major') or mode.__contains__('Major'):
+                    result = status('I')
+                else:
+                    result = status('i')
+            elif 2.0 <= dice < 2.5:
+                if mode.__contains__('major') or mode.__contains__('Major'):
+                    result = status('iii')
+                else:
+                    result = status('III')
+            elif 2.5 <= dice < 3.5:
+                if mode.__contains__('major') or mode.__contains__('Major'):
+                    result = status('IV')
+                else:
+                    result = status('iv')
+            elif 3.5 <= dice < 5.5:
+                result = status('V')
+            else:
+                if mode.__contains__('major') or mode.__contains__('Major'):
+                    result = status('vi')
+                else:
+                    result = status('VI')
 
         return result
 
@@ -465,60 +466,60 @@ class secondOrderMarkovChain():
         rand = (random.random()) * 4.0
         if prev_stat.get_status_name().__contains__('i') or prev_stat.get_status_name().__contains__('I'):
             if rand < 1.0:
-                return status('i')
+                return status('I')
             elif 1.0 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('ii') or prev_stat.get_status_name().__contains__('II'):
             if rand < 1.0:
-                return status('i')
+                return status('I')
             elif 1.0 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('iii') or prev_stat.get_status_name().__contains__('III'):
             if rand < 0.25:
-                return status('i')
+                return status('I')
             elif 0.25 <= rand < 3.25:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('iv') or prev_stat.get_status_name().__contains__('IV'):
             if rand < 1.0:
-                return status('i')
+                return status('I')
             elif 1.0 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('v') or prev_stat.get_status_name().__contains__('V'):
             if rand < 0.5:
-                return status('v')
+                return status('V')
             elif 0.5 <= rand < 3.5:
-                return status('i')
+                return status('I')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('vi') or prev_stat.get_status_name().__contains__('VI'):
             if rand < 1.0:
-                return status('i')
+                return status('I')
             elif 1.0 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         elif prev_stat.get_status_name().__contains__('vii') or prev_stat.get_status_name().__contains__('VII'):
             if rand < 1.75:
-                return status('i')
+                return status('I')
             elif 1.75 <= rand < 3.75:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
         else:
             if rand < 1.5:
-                return status('i')
+                return status('I')
             elif 1.5 <= rand < 3.0:
-                return status('v')
+                return status('V')
             else:
-                return status('iv')
+                return status('IV')
 
     # TO DETERMINE IF ONE CHORD IS ACCEPTABLE WITH THE GIVEN MELODY
     def acceptable(self, chord_name: str, measure_notes) -> bool:
