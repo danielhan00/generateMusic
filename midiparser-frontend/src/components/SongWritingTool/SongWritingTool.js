@@ -262,7 +262,7 @@ export const SongWritingTool =(props)=>{
     return <div className="SWContainer">
         <MidiInput  tempo={tempo} setTempo={setTempo} timeSigNum={beatsPerMeasure} setTimeSigNum={setBeatsPerMeasure} setTimeSigDenom={setTimeSigDenom} timeSigDenom={timeSigDenom}
             melody={melody} setMelody={setMelody} chordNum={chordNum} setChordNum={setChordNum} updateChords={updateChords} setUpdateChords={setUpdateChords}
-            chordNotes={chordNotes}  isLoading={isLoading} notesByMeasure={notesByMeasure} setNotesByMeasure={setNotesByMeasure} saveFile={exportChordMidi}
+            chordNotes={chordNotes}  isLoading={isLoading} notesByMeasure={notesByMeasure} setNotesByMeasure={setNotesByMeasure} saveFile={exportChordMidi} findOctave={findOctave}
         ></MidiInput>
         <SuggestionBar togglePlay={toggle} measures={chordNum} chords={chords} setChords={setChords} isLoading={isLoading} />
        <TransportBar playing={isActive || isLoading} genre={genre} genreOptions={genreMessage.data.genreOptions} genreChangeClick={setGenre} accompaniment={chordSoundName} setAccompaniment={changeAccompaniment}

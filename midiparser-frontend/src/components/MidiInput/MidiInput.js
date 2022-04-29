@@ -137,6 +137,23 @@ export const MidiInput = (props) => {
     //props.setChordNotes(midi.chords)
   }
 
+  const noteMap = new Map();
+  noteMap.set('C', 0)
+  noteMap.set('C#', 1)
+  noteMap.set('Db', 1)
+  noteMap.set('D#', 3)
+  noteMap.set('Eb', 3)
+  noteMap.set('E', 4)
+  noteMap.set('F', 5)
+  noteMap.set('F#', 6)
+  noteMap.set('Gb', 6)
+  noteMap.set('G', 7)
+  noteMap.set('G#', 8)
+  noteMap.set('Ab', 8)
+  noteMap.set('A', 9)
+  noteMap.set('A#', 10)
+  noteMap.set('Bb', 10)
+  noteMap.set('B', 11)
 
 /**
  * Helper function to add the generated chords to the piano roll
@@ -146,8 +163,9 @@ export const MidiInput = (props) => {
     midi.chords = [];
     if (props.chordNotes !== undefined && props.chordNotes.length !== 0) {
       for (let i = 0; i < props.chordNotes.length; i++) {
+        let rootNote = props.chordNotes[i][0];
         for (let j = 0; j < props.chordNotes[i].length; j++) {
-          let note = [`${i}:0:0`, props.chordNotes[i][j] + 3, "1n"]
+          let note = [`${i}:0:0`, props.findOctave(props.chordNotes[i][j], rootNote, 2, i > 2), "1n"]
           midi.chords.push(note);
         }
       }
