@@ -141,6 +141,7 @@ export const MidiInput = (props) => {
   noteMap.set('C', 0)
   noteMap.set('C#', 1)
   noteMap.set('Db', 1)
+  noteMap.set('D', 2)
   noteMap.set('D#', 3)
   noteMap.set('Eb', 3)
   noteMap.set('E', 4)

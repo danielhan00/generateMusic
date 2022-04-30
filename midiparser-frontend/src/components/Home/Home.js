@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
-import './Home.css';
+import React, { useEffect, useState } from "react"
+import './Home.css'
 import {
     BrowserRouter as Router,
-    Routes,
-    Route,
     Link
-} from "react-router-dom";
-import { LivePerformanceTool } from "../LivePerformanceTool/LivePerformanceTool";
-import { SongWritingTool } from "../SongWritingTool/SongWritingTool";
+} from "react-router-dom"
 import axios from 'axios'
+import songwritingsnap from './songwritingsnap.png'
+import liveperformancesnap from './liveperformancesnap.png'
 
 export const Home = (props) => {
     const [getMessage, setGetMessage] = useState({})
@@ -30,7 +28,7 @@ export const Home = (props) => {
                 <td>
                     <div className="ContentBox">
                         <Link className="ContentText" to="/songwriting">Songwriting Tool</Link>
-                        <image></image>
+                        <img className ="HomeImage" src={songwritingsnap} alt="Songwriting Tool"/>
                     </div>
                 </td>
                 <td>
@@ -39,15 +37,8 @@ export const Home = (props) => {
                 <td>
                     <div className="ContentBox">
                         <Link className="ContentText" to="/liveperformance">Live Performance Tool</Link>
+                        <img className ="HomeImage" src={liveperformancesnap} alt="Live Performance Tool"/>
                     </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                <div>{getMessage.status === 200 ? 
-          <h3>{getMessage.data.message}</h3>
-          :
-          <h3>LOADING</h3>}</div>
                 </td>
             </tr>
         </table>

@@ -7,7 +7,7 @@
 
 .NavText {
     color: white;
-    font-size: 20px;
+    font-size: 3vh;
 
 }
 
@@ -52,4 +52,9 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.AppLogo {
+    width: 8vh;
+    height: 8vh;
 }

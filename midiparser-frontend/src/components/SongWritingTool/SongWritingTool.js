@@ -136,6 +136,7 @@ export const SongWritingTool =(props)=>{
     noteMap.set('C', 0)
     noteMap.set('C#', 1)
     noteMap.set('Db', 1)
+    noteMap.set('D', 2)
     noteMap.set('D#', 3)
     noteMap.set('Eb', 3)
     noteMap.set('E', 4)
@@ -158,7 +159,7 @@ export const SongWritingTool =(props)=>{
             finalNum += 1;
         }
         // checks if above the fifth of the chord and the interval is less than a minor 6th
-        if (aboveFifth && (noteMap.get(noteName) - noteMap.get(rootName)) % 11 < 8) {
+        if (aboveFifth && ((noteMap.get(noteName) - noteMap.get(rootName)) < 8 || (noteMap.get(noteName) - noteMap.get(rootName)) < -3)) {
             finalNum += 1;
         }
         return noteName +'' + finalNum

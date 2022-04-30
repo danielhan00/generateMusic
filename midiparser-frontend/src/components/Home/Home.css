@@ -16,13 +16,12 @@
 
 .ContentBox {
     margin-top: 10vh;
-    padding: 30px;
+    padding: 3vh;
     width: 25vw;
     height: 60vh;
     background-color: lightgray;
-    border-radius: 30px;
-    box-shadow: 3px 6px rgb(68, 68, 68);
-    cursor: pointer;
+    border-radius: 3vh;
+    box-shadow: 0.3vw 1vh rgb(68, 68, 68);
 }
 
 .Divider {
@@ -31,11 +30,17 @@
 
 .ContentText {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 50px;
+    font-size: 4vh;
     color: black;
 }
 
 .ContentText:hover {
     text-decoration: none;
     color: rgb(82, 139, 204);
+}
+
+.HomeImage {
+    width: 22vw;
+    height: 48vh;
+    border-radius: 2vh;
 }

@@ -88,20 +88,17 @@ def train_markov_chains():
 
     for key in genre_map:
         genre_map[key].refresh_mc()
+        # if you would like to write the chains to file for QA
         #genre_map[key].write_markov_chain_to_file()
         print(key)
     # genre_map['Pop_Major'].refresh_mc()
     # genre_map['Pop_Minor'].refresh_mc()
 train_markov_chains()
-print(findAllChords('A', genre_map.get('Pop_Minor').run(False, 5, 'A', 'Minor', [['a'],['a'],['a'],['a'],['a']])))
 
 # NOT USED: reading markov chain takes too long
 def read_markov_chain(genre: str):
     markovChain = secondOrderMarkovChain(genre, True)
     markovChain.read_markov_chain_from_file(genre)
-    #print(len(markovChain.get_all_status()))
-    #markovChain.spit_out_all_possibility()
-    print(markovChain.run('im', 5))
 
 
 
@@ -130,7 +127,7 @@ class livePerformanceApi(Resource):
     parser.add_argument('numChords', type=int)
     args = parser.parse_args()
     
-    # BAD CODE, HERE UNTIL MARKOV CHAIN GETS REFACTORED
+    # Create empty melody
     melodyNotes = []
     x = 0
     while (x < args.numChords):
@@ -138,7 +135,6 @@ class livePerformanceApi(Resource):
         x += 1
 
     # try to create chords using the data from js request
-    #try:
     chords = findAllChords(args.key, genre_map.get(args.genre + '_' + args.tonality).run(False, args.numChords, args.key, args.tonality, melodyNotes))
     chordNotes = []
     for c in chords:

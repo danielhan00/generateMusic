@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import './ChordDisplay.css';
+import { LineScalePulseOut } from "react-pure-loaders";
 
 export const ChordDisplay = (props) => {
     return <div className="LiveTopContainer">
@@ -8,10 +9,10 @@ export const ChordDisplay = (props) => {
                 <text>Current Chord</text>
             </div>
             <div className="ChordText">
-                <text>{props.chordName}</text>
+                {props.isLoading? <LineScalePulseOut size={200} width={200} height={200} color={'#000'} loading={props.isLoading}/> : <text>{props.chordName}</text>}
             </div>
             <div className='ProgressionText'>
-                <text>{"Chord Progression: " + props.progression.join(", ").toString()}</text>
+                {props.isLoading? <LineScalePulseOut color={'#000'} loading={props.isLoading}/> : <text>{"Chord Progression: " + props.progression.join(", ").toString()}</text>}
             </div>
         </div>
         <div className="NextChordContainer">
@@ -19,7 +20,7 @@ export const ChordDisplay = (props) => {
                 <text>Next Chord</text>
             </div>
             <div className="ChordText">
-                <text>{props.nextChordName}</text>
+                {props.isLoading? <LineScalePulseOut size={200} color={'#000'} loading={props.isLoading}/> : <text>{props.nextChordName}</text>}
             </div>
         </div>
     </div>;

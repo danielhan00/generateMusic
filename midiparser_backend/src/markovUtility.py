@@ -110,6 +110,11 @@ def getNotesFromChordName(name):
         chordNotes = chordObj.components()
         chordObj2 = Chord(name[: name.find('b5')] + 'dim')
         chordNotes[2] = chordObj2.components()[2]
+    elif name.find('7sus') != -1:
+        chordObj = Chord(name[: name.find('7sus')] + 'sus')
+        chordNotes = chordObj.components()
+        chordObj2 = Chord(name[: name.find('7sus')] + 'm7')
+        chordNotes.append(chordObj2.components()[3])
     else:
         chordObj = Chord(name)
         chordNotes = chordObj.components()
@@ -124,6 +129,7 @@ def getNotesFromChordName(name):
 # print(getNotesFromChordName("Bbmmaj9"))
 # print(getNotesFromChordName("Fdim6"))
 # print(getNotesFromChordName("Fb5"))
+# print(getNotesFromChordName("F7sus"))
 
 def validateChords(key, mode, chord, melodyNotes):
     chord = findSingleChord(chord, key)

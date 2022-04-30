@@ -7,23 +7,29 @@ import Soundfont from 'soundfont-player'
 import metAudio from './metronome.wav'
 
 export const LivePerformanceTool = (props) => {
-    // includes starter chord sequence
+    // API States: includes starter data
+    // API State for getting chords and chord notes
     const [chordMessage, setChordMessage] = useState({
         data: {
             chords: ["Amin", "C", "F", "E7"],
             chordNotes: [["A", "C", "E"], ["C", "E", "G"], ["F", "A", "C"], ["E", "G#", "B", "D"]]
         }
     })
-
+    // API State for getting genres
     const [genreMessage, setGenreMessage] = useState({
         data: {
             genreOptions: "Rock, Pop, Jazz"
         }
     })
 
+    // whether the API is loading
+    const [isLoading, setLoading] = useState(true);
+
+    // genre and key information
     const [genre, setGenre] = useState('Pop')
     const [keyLetter, setKeyLetter] = useState('A');
     const [keyQuality, setKeyQuality] = useState('Major');
+
     // chord length is measured in beats
     const [chordLength, setChordLength] = useState(4);
     const [currChordBeats, setCurrChordBeats] = useState(0);
@@ -45,11 +51,12 @@ export const LivePerformanceTool = (props) => {
     const [changeChords, setChangeChords] = useState(0);
 
     // accompaniment style for sound playback
-    const [accompaniment, setAccompaniment] = useState('acoustic_grand_piano');
-    const [accompanimentName, setAccompanimentName] = useState('Piano');
+    const [accompaniment, setAccompaniment] = useState('none');
+    const [accompanimentName, setAccompanimentName] = useState('None');
     const metronomeSound = new Audio(metAudio);
 
     useEffect(() => {
+        setLoading(true);
         axios.post('http://localhost:5000/flask/getchords',
             {
                 "genre": genre,
@@ -61,6 +68,7 @@ export const LivePerformanceTool = (props) => {
                 setChordMessage(response)
                 setCurrChord((response.data.chords)[0])
                 setNextChord((response.data.chords)[1])
+                setLoading(false);
             }).catch(error => {
                 console.log(error)
             })
@@ -82,7 +90,7 @@ export const LivePerformanceTool = (props) => {
         setIsActive(activeNow)
         if (activeNow) {
             if (accompaniment == 'metronome') metronomeSound.play();
-            else playChord(chordMessage.data.chordNotes[0])
+            else if (accompaniment !== 'none') playChord(chordMessage.data.chordNotes[0])
         }
     }
 
@@ -110,6 +118,7 @@ export const LivePerformanceTool = (props) => {
     noteMap.set('C', 0)
     noteMap.set('C#', 1)
     noteMap.set('Db', 1)
+    noteMap.set('D', 2)
     noteMap.set('D#', 3)
     noteMap.set('Eb', 3)
     noteMap.set('E', 4)
@@ -132,7 +141,7 @@ export const LivePerformanceTool = (props) => {
             finalNum += 1;
         }
         // checks if above the fifth of the chord and the interval is less than a minor 6th
-        if (aboveFifth && (noteMap.get(noteName) - noteMap.get(rootName)) % 11 < 8) {
+        if (aboveFifth && ((noteMap.get(noteName) - noteMap.get(rootName)) < 8 || (noteMap.get(noteName) - noteMap.get(rootName)) < -3)) {
             finalNum += 1;
         }
         return noteName +'' + finalNum
@@ -197,7 +206,7 @@ export const LivePerformanceTool = (props) => {
     }, [currChordNum])
 
     return <div className="LiveContainer">
-        <ChordDisplay chordName={currChord} nextChordName={nextChord} progression={chordMessage.data.chords}></ChordDisplay>
+        <ChordDisplay chordName={currChord} nextChordName={nextChord} progression={chordMessage.data.chords} isLoading={isLoading}></ChordDisplay>
         <LiveInfoBar playing={isActive} togglePlay={toggle} currentBeat={currentBeat} accompaniment={accompanimentName} setAccompaniment={changeAccompaniment}
             genre={genre} genreOptions={genreMessage.data.genreOptions} genreChangeClick={setGenre}
             keyLetter={keyLetter} keyLetterClick={setKeyLetter} keyQuality={keyQuality} keyQualityClick={setKeyQuality} tempo={tempo} setTempo={setTempo}

@@ -17,9 +17,9 @@ function App() {
         <nav>
           <table className="NavBar">
               <tr>
-              <td><Link className="NavText" to="/">Home</Link></td>
-              <td><Link className="NavText" to="/songwriting">Songwriting Tool</Link></td>
-              <td><Link className="NavText" to="/liveperformance">Live Performance Tool</Link></td>
+                <td><Link className="NavText" to="/">Home</Link></td>
+                <td><Link className="NavText" to="/songwriting">Songwriting Tool</Link></td>
+                <td><Link className="NavText" to="/liveperformance">Live Performance Tool</Link></td>
               </tr>
           </table>
         </nav>
