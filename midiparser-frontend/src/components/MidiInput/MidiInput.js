@@ -56,6 +56,9 @@ export const MidiInput = (props) => {
 
   //takes values from the global and updates the midi states when a new file is uploaded
   useEffect(() => {
+    if (currFile === "No file selected") {
+      setPianoRoll();
+    }
     updateMidi(midiFile);
   }, [content]);
 

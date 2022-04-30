@@ -77,6 +77,10 @@ export const SongWritingTool =(props)=>{
 
     }, []) 
 
+    useEffect(() => {
+        setLoading(true)
+    }, [])
+
     /**
      * to toggle the sound of a specific measure
      * @param {number} measure 
