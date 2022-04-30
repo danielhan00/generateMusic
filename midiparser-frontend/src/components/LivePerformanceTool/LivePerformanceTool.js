@@ -160,7 +160,7 @@ export const LivePerformanceTool = (props) => {
                 var rootNote = notes[0]
                 
                 for (let i = 0; i < notes.length; i++) {
-                    instrument.play(findOctave(notes[i], rootNote, 4, i > 2), ac.currentTime, { duration: chordLength * (60/tempo)})
+                    instrument.play(findOctave(notes[i], rootNote, 3, i > 2), ac.currentTime, { duration: chordLength * (60/tempo)})
                 }
             }
           })
