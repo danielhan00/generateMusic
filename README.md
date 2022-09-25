@@ -1,4 +1,4 @@
-# midiParser
+# Generate Music with ML and Markov chains!
 MUST Capstone Project: HardChord
 
 Project Details
